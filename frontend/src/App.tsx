@@ -23,49 +23,53 @@ import { UserProfile } from "./pages/Dashboard/UserProfile";
 import { UserManagement } from "./pages/Admin/UserManagement";
 import { AuditCenter } from "./pages/Admin/AuditCenter";
 import { SystemSettings } from "./pages/Admin/SystemSettings";
+import { SystemMonitor } from "./pages/Admin/SystemMonitor";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Placeholder title="Registration" />} />
-        </Route>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Placeholder title="Registration" />} />
+          </Route>
 
-        {/* Protected Dashboard Routes */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<ExecutiveDashboard />} />
-          <Route path="revenue" element={<RevenueDashboard />} />
-          <Route path="chat" element={<Chat />} />
-          <Route path="custom" element={<DashboardBuilder />} />
-          <Route path="reports" element={<ReportCenter />} />
-          <Route path="catalog" element={<DataCatalog />} />
-          <Route path="inspector" element={<QueryInspector />} />
-          <Route path="profile" element={<UserProfile />} />
+          {/* Protected Dashboard Routes */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ExecutiveDashboard />} />
+            <Route path="revenue" element={<RevenueDashboard />} />
+            <Route path="chat" element={<Chat />} />
+            <Route path="custom" element={<DashboardBuilder />} />
+            <Route path="reports" element={<ReportCenter />} />
+            <Route path="catalog" element={<DataCatalog />} />
+            <Route path="inspector" element={<QueryInspector />} />
+            <Route path="profile" element={<UserProfile />} />
+            
+            <Route path="admin/users" element={<UserManagement />} />
+            <Route path="admin/audit" element={<AuditCenter />} />
+            <Route path="admin/settings" element={<SystemSettings />} />
+            <Route path="admin/monitor" element={<SystemMonitor />} />
+
+            <Route path="users" element={<Placeholder title="User Management" />} />
+            <Route path="admin" element={<Placeholder title="System Administration" />} />
+            <Route path="companies" element={<Placeholder title="Company Management" />} />
+          </Route>
           
-          <Route path="admin/users" element={<UserManagement />} />
-          <Route path="admin/audit" element={<AuditCenter />} />
-          <Route path="admin/settings" element={<SystemSettings />} />
-
-          
-          <Route path="users" element={<Placeholder title="User Management" />} />
-          <Route path="admin" element={<Placeholder title="System Administration" />} />
-          <Route path="audit-logs" element={<Placeholder title="Security & Audit Logs" />} />
-        </Route>
-
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<Placeholder title="404 Not Found" />} />
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
