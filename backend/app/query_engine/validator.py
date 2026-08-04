@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 from app.semantic.engine import SemanticEngine
+from fastapi import HTTPException
 
 class QueryValidator:
     """
@@ -13,7 +14,7 @@ class QueryValidator:
         for name in metric_names:
             metric = SemanticEngine.get_metric_definition(name)
             if not metric:
-                raise ValueError(f"Validation Error: Unknown metric '{name}'. This metric is not defined in the Semantic Layer.")
+                raise HTTPException(status_code=400, detail=f"Invalid metric '{name}'. This metric is not defined in the Semantic Layer.")
             
             # Validate Dimensions
             for dim in dimensions:
@@ -27,12 +28,12 @@ class QueryValidator:
             # Example: Viewers can't see profit margins
             for name in metric_names:
                 if name.lower() in ["profit", "margin", "gross profit", "operating profit"]:
-                    raise PermissionError(f"Permission Error: Role '{user_role}' is not authorized to query '{name}'.")
+                    raise HTTPException(status_code=403, detail=f"Permission Error: Role '{user_role}' is not authorized to query '{name}'.")
                     
         # 3. Filter Validation
         if filters:
             for f in filters:
                 if not f.get("field") or not f.get("operator"):
-                    raise ValueError("Validation Error: Invalid filter format. Must contain 'field' and 'operator'.")
+                    raise HTTPException(status_code=400, detail="Validation Error: Invalid filter format. Must contain 'field' and 'operator'.")
         
         return True

@@ -9,75 +9,82 @@ class BaseLLMProvider(ABC):
     async def generate(self, system_prompt: str, user_prompt: str) -> str:
         pass
 
-class GeminiProvider(BaseLLMProvider):
+class OrchestratedProvider(BaseLLMProvider):
+    """
+    Implements a fallback mechanism: Gemini -> Deepseek -> OpenRouter
+    """
     def __init__(self):
-        # We will use the REST API via httpx for dependency-light integration
-        self.api_key = os.getenv("GEMINI_API_KEY", os.getenv("OPENAI_API_KEY", "")) # Fallback for testing
-        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+        self.gemini_key = os.getenv("GEMINI_API_KEY", "")
+        self.deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
+        self.openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
         
     async def generate(self, system_prompt: str, user_prompt: str) -> str:
-        if not self.api_key:
-            # Fallback for when API key is not set during scaffold testing
-            return self._generate_stub_response(system_prompt, user_prompt)
-            
-        headers = {'Content-Type': 'application/json'}
-        payload = {
-            "system_instruction": {
-                "parts": [{"text": system_prompt}]
-            },
-            "contents": [{
-                "parts": [{"text": user_prompt}]
-            }],
-            "generationConfig": {
-                "temperature": 0.1 # Low temp for analytical accuracy
-            }
-        }
-        
+        # 1. Try Gemini
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    f"{self.base_url}?key={self.api_key}",
-                    headers=headers,
-                    json=payload,
-                    timeout=30.0
-                )
-                response.raise_for_status()
-                data = response.json()
-                return data['candidates'][0]['content']['parts'][0]['text']
+            print("Attempting Gemini API...")
+            return await self._call_gemini(system_prompt, user_prompt)
         except Exception as e:
-            print(f"Gemini API Error: {e}")
-            return self._generate_stub_response(system_prompt, user_prompt)
+            print(f"Gemini failed: {e}. Falling back to Deepseek...")
             
-    def _generate_stub_response(self, system_prompt: str, user_prompt: str) -> str:
-        """Fallback stub for testing without API keys."""
-        if "OUTPUT FORMAT:" in system_prompt:
-            # Stub intent extraction
-            return json.dumps({
-                "intent": "Revenue Question",
-                "is_valid": True,
-                "rejection_reason": "",
-                "metrics": ["Revenue"],
-                "dimensions": ["Time"],
-                "filters": [],
-                "time_grain": "Monthly"
-            })
-        else:
-            # Stub insight generation
-            return """Here is the executive summary based on the data:
-Revenue has shown consistent performance.
+        # 2. Try Deepseek
+        try:
+            return await self._call_deepseek(system_prompt, user_prompt)
+        except Exception as e:
+            print(f"Deepseek failed: {e}. Falling back to OpenRouter...")
+            
+        # 3. Try OpenRouter
+        try:
+            return await self._call_openrouter(system_prompt, user_prompt)
+        except Exception as e:
+            print(f"OpenRouter failed: {e}.")
+            raise RuntimeError("All configured LLM providers failed.")
 
-```json
-{
-  "type": "chart",
-  "chartType": "bar",
-  "data": [{"name": "Placeholder", "value": 100}]
-}
-```
-"""
+    async def _call_gemini(self, system_prompt: str, user_prompt: str) -> str:
+        if not self.gemini_key: raise ValueError("No Gemini Key")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.gemini_key}"
+        payload = {
+            "system_instruction": {"parts": [{"text": system_prompt}]},
+            "contents": [{"parts": [{"text": user_prompt}]}],
+            "generationConfig": {"temperature": 0.1}
+        }
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(url, json=payload, timeout=20.0)
+            resp.raise_for_status()
+            return resp.json()['candidates'][0]['content']['parts'][0]['text']
 
-def get_llm_provider(provider_name: str = "gemini") -> BaseLLMProvider:
-    # Factory allows easy swapping to OpenAI, Groq, etc. in the future
-    if provider_name.lower() == "gemini":
-        return GeminiProvider()
-    # Add OpenAIProvider(), GroqProvider() here
-    return GeminiProvider()
+    async def _call_deepseek(self, system_prompt: str, user_prompt: str) -> str:
+        if not self.deepseek_key: raise ValueError("No Deepseek Key")
+        url = "https://api.deepseek.com/chat/completions"
+        headers = {"Authorization": f"Bearer {self.deepseek_key}", "Content-Type": "application/json"}
+        payload = {
+            "model": "deepseek-chat",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.1
+        }
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(url, headers=headers, json=payload, timeout=20.0)
+            resp.raise_for_status()
+            return resp.json()['choices'][0]['message']['content']
+
+    async def _call_openrouter(self, system_prompt: str, user_prompt: str) -> str:
+        if not self.openrouter_key: raise ValueError("No OpenRouter Key")
+        url = "https://openrouter.ai/api/v1/chat/completions"
+        headers = {"Authorization": f"Bearer {self.openrouter_key}", "Content-Type": "application/json"}
+        payload = {
+            "model": "anthropic/claude-3.5-sonnet", # Fallback model
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.1
+        }
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(url, headers=headers, json=payload, timeout=20.0)
+            resp.raise_for_status()
+            return resp.json()['choices'][0]['message']['content']
+
+def get_llm_provider(provider_name: str = "orchestrated") -> BaseLLMProvider:
+    return OrchestratedProvider()

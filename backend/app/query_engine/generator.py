@@ -35,12 +35,13 @@ class QueryGenerator:
                 safe_dim = dim.lower().replace(" ", "_")
                 # Very basic dimension mapping for scaffold, real implementation would use a dimension registry
                 if safe_dim == "time":
+                    date_col = "order_date" if base_table == "orders" else "date"
                     if time_grain == "Monthly":
-                        select_clauses.append(f"DATE_TRUNC('month', {base_table}.date) AS time")
-                        group_by_clauses.append(f"DATE_TRUNC('month', {base_table}.date)")
+                        select_clauses.append(f"STRFTIME('%Y-%m', {base_table}.{date_col}) AS time")
+                        group_by_clauses.append(f"STRFTIME('%Y-%m', {base_table}.{date_col})")
                     else: # Default Daily
-                        select_clauses.append(f"DATE({base_table}.date) AS time")
-                        group_by_clauses.append(f"DATE({base_table}.date)")
+                        select_clauses.append(f"DATE({base_table}.{date_col}) AS time")
+                        group_by_clauses.append(f"DATE({base_table}.{date_col})")
                 elif safe_dim == "region":
                     select_clauses.append("regions.name AS region")
                     group_by_clauses.append("regions.name")
