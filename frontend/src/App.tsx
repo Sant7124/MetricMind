@@ -6,12 +6,6 @@ import { Login } from "./pages/Login";
 import { Placeholder } from "./pages/Placeholder";
 import { useAuth } from "./contexts/AuthContext";
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
-  
-  if (isLoading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  
 import { ExecutiveDashboard } from "./pages/Dashboard/ExecutiveDashboard";
 import { RevenueDashboard } from "./pages/Dashboard/RevenueDashboard";
 import { Chat } from "./pages/Dashboard/Chat";
@@ -25,6 +19,15 @@ import { AuditCenter } from "./pages/Admin/AuditCenter";
 import { SystemSettings } from "./pages/Admin/SystemSettings";
 import { SystemMonitor } from "./pages/Admin/SystemMonitor";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  
+  return <>{children}</>;
+}
 
 function App() {
   return (
