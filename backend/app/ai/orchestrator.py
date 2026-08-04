@@ -41,9 +41,30 @@ class AgentOrchestrator:
             
         # 3. Query Engine Execution (Completely bypassing LLM SQL generation)
         try:
+            import time
+            start_time = time.time()
             QueryValidator.validate(metrics, dimensions, filters)
             sql, params = QueryGenerator.generate_sql(metrics, dimensions, filters, time_grain)
             raw_data = await self.warehouse.execute_query(sql, params)
+            exec_time = round((time.time() - start_time) * 1000, 2)
+            
+            # Log for AI Governance / Query Inspector
+            from app.api.v1.endpoints.governance import log_query_inspection
+            import uuid
+            from datetime import datetime
+            
+            log_query_inspection({
+                "id": str(uuid.uuid4()),
+                "timestamp": datetime.utcnow().isoformat(),
+                "user_message": user_message,
+                "metrics": metrics,
+                "dimensions": dimensions,
+                "generated_sql": sql,
+                "execution_time_ms": exec_time,
+                "rows_returned": len(raw_data),
+                "semantic_validation": "Passed"
+            })
+            
         except Exception as e:
             return f"Semantic Engine Error: {str(e)}"
             
