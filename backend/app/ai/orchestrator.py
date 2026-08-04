@@ -12,12 +12,19 @@ class AgentOrchestrator:
         self.provider = get_llm_provider("gemini")
         self.warehouse = get_warehouse_adapter("postgres")
         
-    async def process_chat(self, user_message: str, history: list = None) -> str:
+    async def process_chat(self, user_message: str, history: list = None, user_role: str = "Viewer") -> str:
         """
         The master pipeline: Natural Language -> Intent -> Semantic Layer -> Warehouse -> Insights -> Response
         """
         # 1. Intent & Entity Extraction
-        intent_response = await self.provider.generate(SYSTEM_PROMPT_INTENT_EXTRACTION, user_message)
+        history_context = ""
+        if history:
+            history_context = "\n\nCHAT HISTORY:\n" + "\n".join(
+                [f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in history[-4:]]
+            )
+            
+        full_user_message = user_message + history_context
+        intent_response = await self.provider.generate(SYSTEM_PROMPT_INTENT_EXTRACTION, full_user_message)
         
         try:
             # Clean markdown block if provider returns ```json
@@ -25,6 +32,13 @@ class AgentOrchestrator:
             parsed_intent = json.loads(clean_json)
         except json.JSONDecodeError:
             return "I'm sorry, I couldn't understand that request. Could you rephrase?"
+            
+        # Conversational Bypass
+        if parsed_intent.get("intent") == "Conversational":
+            chat_prompt = f"User Question: {user_message}\nRespond in a helpful, conversational manner as MetricMind AI."
+            if history_context:
+                chat_prompt += f"\n{history_context}"
+            return await self.provider.generate("You are the MetricMind Executive Analyst.", chat_prompt)
             
         # 2. AI Safety / Semantic Validation
         if not parsed_intent.get("is_valid"):
@@ -43,7 +57,7 @@ class AgentOrchestrator:
         try:
             import time
             start_time = time.time()
-            QueryValidator.validate(metrics, dimensions, filters)
+            QueryValidator.validate(metrics, dimensions, filters, user_role=user_role)
             sql, params = QueryGenerator.generate_sql(metrics, dimensions, filters, time_grain)
             raw_data = await self.warehouse.execute_query(sql, params)
             exec_time = round((time.time() - start_time) * 1000, 2)
