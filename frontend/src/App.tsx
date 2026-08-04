@@ -12,8 +12,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (isLoading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
   if (!isAuthenticated) return <Navigate to="/login" />;
   
-  return <>{children}</>;
-}
+import { ExecutiveDashboard } from "./pages/Dashboard/ExecutiveDashboard";
+import { RevenueDashboard } from "./pages/Dashboard/RevenueDashboard";
 
 function App() {
   return (
@@ -35,9 +35,11 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Placeholder title="Executive Dashboard" />} />
+          <Route index element={<ExecutiveDashboard />} />
+          <Route path="revenue" element={<RevenueDashboard />} />
           <Route path="chat" element={<Placeholder title="AI Semantic Chat" />} />
           <Route path="metrics" element={<Placeholder title="Metrics & Definitions" />} />
+
           <Route path="reports" element={<Placeholder title="Reports Engine" />} />
           <Route path="semantic-layer" element={<Placeholder title="Semantic Layer Config" />} />
           <Route path="warehouse" element={<Placeholder title="Data Warehouse Integration" />} />

@@ -25,6 +25,7 @@ export function DashboardLayout() {
 
   const navigation = [
     { name: 'Executive Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Revenue', href: '/dashboard/revenue', icon: BarChart2 },
     { name: 'Chat', href: '/dashboard/chat', icon: MessageSquare },
     { name: 'Metrics', href: '/dashboard/metrics', icon: BarChart2 },
     { name: 'Reports', href: '/dashboard/reports', icon: FileText },
