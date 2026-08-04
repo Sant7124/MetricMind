@@ -14,34 +14,39 @@ class OrchestratedProvider(BaseLLMProvider):
     Implements a fallback mechanism: Gemini -> Deepseek -> OpenRouter
     """
     def __init__(self):
-        self.gemini_key = os.getenv("GEMINI_API_KEY", "")
-        self.deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
-        self.openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
+        from app.core.config import settings
+        self.gemini_key = settings.GEMINI_API_KEY
+        self.deepseek_key = settings.DEEPSEEK_API_KEY
+        self.openrouter_key = settings.OPENROUTER_API_KEY
         
     async def generate(self, system_prompt: str, user_prompt: str) -> str:
-        # 1. Try Gemini
-        try:
-            print("Attempting Gemini API...")
-            return await self._call_gemini(system_prompt, user_prompt)
-        except Exception as e:
-            print(f"Gemini failed: {e}. Falling back to Deepseek...")
-            
-        # 2. Try Deepseek
-        try:
-            return await self._call_deepseek(system_prompt, user_prompt)
-        except Exception as e:
-            print(f"Deepseek failed: {e}. Falling back to OpenRouter...")
-            
-        # 3. Try OpenRouter
-        try:
-            return await self._call_openrouter(system_prompt, user_prompt)
-        except Exception as e:
-            print(f"OpenRouter failed: {e}.")
-            raise RuntimeError("All configured LLM providers failed.")
+        import asyncio
+        tasks = [
+            asyncio.create_task(self._call_gemini(system_prompt, user_prompt), name="Gemini"),
+            asyncio.create_task(self._call_deepseek(system_prompt, user_prompt), name="Deepseek"),
+            asyncio.create_task(self._call_openrouter(system_prompt, user_prompt), name="OpenRouter")
+        ]
+        
+        pending = set(tasks)
+        while pending:
+            done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+            for task in done:
+                try:
+                    result = task.result()
+                    # Cancel remaining tasks
+                    for p in pending:
+                        p.cancel()
+                    print(f"{task.get_name()} succeeded first. Canceling others.")
+                    return result
+                except Exception as e:
+                    print(f"{task.get_name()} failed: {e}")
+                    pass
+                    
+        raise RuntimeError("All configured LLM providers failed.")
 
     async def _call_gemini(self, system_prompt: str, user_prompt: str) -> str:
         if not self.gemini_key: raise ValueError("No Gemini Key")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.gemini_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_key}"
         payload = {
             "system_instruction": {"parts": [{"text": system_prompt}]},
             "contents": [{"parts": [{"text": user_prompt}]}],
@@ -74,7 +79,7 @@ class OrchestratedProvider(BaseLLMProvider):
         url = "https://openrouter.ai/api/v1/chat/completions"
         headers = {"Authorization": f"Bearer {self.openrouter_key}", "Content-Type": "application/json"}
         payload = {
-            "model": "anthropic/claude-3.5-sonnet", # Fallback model
+            "model": "openai/gpt-4o-mini", # Fallback model
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
