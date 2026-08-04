@@ -15,17 +15,18 @@ MetricMind is a production-grade, Agentic Conversational Business Intelligence p
 - **SQL Injection Prevention**: All queries are dynamically parameterized and routed through SQLAlchemy Core.
 
 ### 2. Conversational BI (Agentic AI)
-- **Natural Language to JSON**: AI interprets intent and extracts business parameters, passing them to the Semantic Layer.
+- **Parallel LLM Routing (LLM Racing)**: Dispatches queries to Gemini, Claude, and OpenRouter simultaneously to guarantee lightning-fast sub-second responses.
+- **Natural Language to JSON**: AI interprets intent and extracts business parameters, strictly conforming to the semantic layer constraints without hallucinating dimensions.
 - **Dynamic Render Engine**: AI responses embed custom markdown tokens (` ```json { "type": "chart" } ``` `) which the React frontend instantly transforms into interactive Recharts visualizations.
-- **Provider Agnostic**: Easily swap between Gemini, OpenAI, or Local LLMs via the Admin Panel.
 
 ### 3. Analytics & Visualization
 - **Executive Dashboards**: Real-time KPI cards with mini sparklines, trend arrows, and complex tooltips.
 - **Custom Dashboard Builder**: Slot-based grid allowing users to construct their own BI views.
+- **Dedicated Content Pages**: Highly animated, Framer Motion-powered Features and Pricing marketing pages built into the core router.
 - **Data Catalog**: Searchable business glossary for non-technical users to understand formulas.
 
 ### 4. Administration & Observability
-- **Role-Based Access Control (RBAC)**: Deep user management (Super Admin, Executive, Analyst).
+- **Role-Based Access Control (RBAC)**: Deep user management (Super Admin, Executive, Analyst, Viewer).
 - **Query Inspector**: A transparent observability tool that proves to executives exactly what SQL the AI generated and how long it took.
 - **Audit Center**: Global enterprise security logging (Logins, Exports, Role Changes).
 - **System Monitoring**: Live telemetry of CPU, Memory, DB latency, and active sessions.
@@ -37,15 +38,17 @@ MetricMind is a production-grade, Agentic Conversational Business Intelligence p
 ### Frontend
 - **React 19** + **Vite**
 - **TailwindCSS** + Glassmorphism UI
-- **Framer Motion** (Micro-animations)
+- **Framer Motion** (Stunning micro-animations & page transitions)
 - **Recharts** (Enterprise Visualizations)
 - **React Router** (Protected/Public flows)
+- **Lucide React** (Beautiful iconography)
 
 ### Backend
 - **FastAPI** (Async Python 3.11+)
 - **SQLAlchemy 2.0** (Core + ORM)
-- **PostgreSQL** (Primary Data Warehouse & App DB)
+- **PostgreSQL / SQLite** (Primary Data Warehouse & App DB)
 - **Pytest** (Automated Testing)
+- **AsyncIO** (For parallel LLM racing & non-blocking execution)
 
 ---
 
@@ -55,7 +58,7 @@ MetricMind is a production-grade, Agentic Conversational Business Intelligence p
 MetricMind/
 ├── backend/
 │   ├── app/
-│   │   ├── ai/            # Orchestrator, Prompts, LLM Providers
+│   │   ├── ai/            # Orchestrator, Prompts, LLM Providers (Racing)
 │   │   ├── api/v1/        # Admin, Audit, Catalog, Governance, Chat APIs
 │   │   ├── core/          # Config, Security, JWT
 │   │   ├── db/            # Database Sessions, Migrations
@@ -70,7 +73,7 @@ MetricMind/
 │   │   ├── components/    # Reusable UI (ErrorBoundary, Cards)
 │   │   ├── contexts/      # AuthContext, ThemeContext
 │   │   ├── layouts/       # DashboardLayout (Sidebar, Topbar)
-│   │   ├── pages/         # Admin, Dashboard, Chat UIs
+│   │   ├── pages/         # Admin, Dashboard, Chat, Pricing, Features UIs
 │   │   └── services/      # Axios API Client
 │   └── package.json
 └── README.md
@@ -83,8 +86,9 @@ MetricMind/
 ### 1. Environment Variables
 Create a `.env` in `backend/`:
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/metricmind
-GEMINI_API_KEY=your_key_here
+DATABASE_URL=sqlite:///./metricmind.db
+GEMINI_API_KEY=your_gemini_key
+OPENROUTER_API_KEY=your_openrouter_key
 SECRET_KEY=super_secret_jwt_key
 ```
 
@@ -109,6 +113,7 @@ npm run dev
 - **FastAPI Exception Handlers**: Strips tracebacks from production API errors.
 - **Memoization**: Heavy chart components are wrapped in `React.memo` to prevent re-renders during Chat streaming.
 - **Rate Limiting & CORS**: Restricted cross-origin resource sharing configured.
+- **Admin Context Injection**: Securely passes user authentication tokens directly into the Semantic layer for stringent RBAC verification.
 
 ---
 *Developed by Advanced Agentic Engineering Team*
