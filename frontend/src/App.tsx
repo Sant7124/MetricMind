@@ -15,6 +15,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 import { ExecutiveDashboard } from "./pages/Dashboard/ExecutiveDashboard";
 import { RevenueDashboard } from "./pages/Dashboard/RevenueDashboard";
 import { Chat } from "./pages/Dashboard/Chat";
+import { DashboardBuilder } from "./pages/Dashboard/DashboardBuilder";
+import { ReportCenter } from "./pages/Dashboard/ReportCenter";
+import { DataCatalog } from "./pages/Dashboard/DataCatalog";
+import { QueryInspector } from "./pages/Dashboard/QueryInspector";
+import { UserProfile } from "./pages/Dashboard/UserProfile";
+import { UserManagement } from "./pages/Admin/UserManagement";
+import { AuditCenter } from "./pages/Admin/AuditCenter";
+import { SystemSettings } from "./pages/Admin/SystemSettings";
 
 function App() {
   return (
@@ -39,12 +47,16 @@ function App() {
           <Route index element={<ExecutiveDashboard />} />
           <Route path="revenue" element={<RevenueDashboard />} />
           <Route path="chat" element={<Chat />} />
-          <Route path="metrics" element={<Placeholder title="Metrics & Definitions" />} />
+          <Route path="custom" element={<DashboardBuilder />} />
+          <Route path="reports" element={<ReportCenter />} />
+          <Route path="catalog" element={<DataCatalog />} />
+          <Route path="inspector" element={<QueryInspector />} />
+          <Route path="profile" element={<UserProfile />} />
+          
+          <Route path="admin/users" element={<UserManagement />} />
+          <Route path="admin/audit" element={<AuditCenter />} />
+          <Route path="admin/settings" element={<SystemSettings />} />
 
-
-          <Route path="reports" element={<Placeholder title="Reports Engine" />} />
-          <Route path="semantic-layer" element={<Placeholder title="Semantic Layer Config" />} />
-          <Route path="warehouse" element={<Placeholder title="Data Warehouse Integration" />} />
           
           <Route path="users" element={<Placeholder title="User Management" />} />
           <Route path="admin" element={<Placeholder title="System Administration" />} />
