@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import { Moon, Sun } from "lucide-react";
 
@@ -15,8 +15,8 @@ export function MainLayout() {
           <span className="font-semibold text-xl tracking-tight">MetricMind</span>
         </div>
         <nav className="flex items-center gap-6">
-          <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</a>
-          <a href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">Pricing</a>
+          <Link to="/features" className="text-sm font-medium hover:text-primary transition-colors">Features</Link>
+          <Link to="/pricing" className="text-sm font-medium hover:text-primary transition-colors">Pricing</Link>
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="p-2 rounded-full hover:bg-secondary transition-colors"
