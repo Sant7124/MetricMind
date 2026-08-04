@@ -1,34 +1,36 @@
 from fastapi import APIRouter
-from typing import List, Dict, Any
-import random
-from datetime import datetime, timedelta
-from app.utils.responses import success_response, APIResponse
+from app.utils.responses import success_response, error_response, APIResponse
+from app.database.session import AsyncSessionLocal
+from sqlalchemy import select, func
+from app.models.system import AuditLog
 
 router = APIRouter()
 
-def generate_mock_audits() -> List[Dict[str, Any]]:
-    actions = ["Login", "Logout", "Dashboard Created", "Report Exported", "AI Query", "Analytics Query", "Role Changed"]
-    users = ["Alice Executive", "Bob Analyst", "Charlie Manager", "System"]
-    logs = []
-    
-    now = datetime.utcnow()
-    for i in range(50):
-        logs.append({
-            "id": f"log-{1000+i}",
-            "timestamp": (now - timedelta(minutes=random.randint(1, 2880))).isoformat(),
-            "user": random.choice(users),
-            "action": random.choice(actions),
-            "ip_address": f"192.168.1.{random.randint(1, 255)}",
-            "execution_time_ms": random.randint(10, 1500) if "Query" in actions else None,
-            "details": "Action completed successfully."
-        })
-    return sorted(logs, key=lambda x: x["timestamp"], reverse=True)
-
-AUDIT_DB = generate_mock_audits()
-
 @router.get("/", response_model=APIResponse)
 async def get_audit_logs(limit: int = 50, offset: int = 0):
-    return success_response(data={
-        "logs": AUDIT_DB[offset:offset+limit],
-        "total": len(AUDIT_DB)
-    })
+    async with AsyncSessionLocal() as session:
+        # Get total count
+        count_stmt = select(func.count()).select_from(AuditLog)
+        total = await session.execute(count_stmt)
+        total_count = total.scalar() or 0
+        
+        # Get logs
+        stmt = select(AuditLog).order_by(AuditLog.created_at.desc()).offset(offset).limit(limit)
+        result = await session.execute(stmt)
+        logs = result.scalars().all()
+        
+        formatted_logs = []
+        for log in logs:
+            formatted_logs.append({
+                "id": str(log.id),
+                "timestamp": log.created_at.isoformat(),
+                "user": "System" if not log.user_id else str(log.user_id), # Ideally join with User table for name
+                "action": log.action,
+                "ip_address": log.ip_address or "Unknown",
+                "details": str(log.changes)
+            })
+            
+        return success_response(data={
+            "logs": formatted_logs,
+            "total": total_count
+        })

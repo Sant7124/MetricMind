@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from app.api.v1.endpoints import (
-    health, auth, users, roles, permissions, companies, 
-    dashboards, reports, analytics, chat, admin, audit, catalog, governance,
+    health, auth, reports, analytics, chat, admin, audit, catalog, governance,
     export, monitoring
 )
 
