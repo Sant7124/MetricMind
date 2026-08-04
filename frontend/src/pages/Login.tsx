@@ -2,19 +2,42 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { motion } from "framer-motion";
-import { ArrowRight, Lock, Mail } from "lucide-react";
+import { ArrowRight, Lock, Mail, Loader2 } from "lucide-react";
+import api from "../services/api";
 
 export function Login() {
   const [email, setEmail] = useState("admin@metricmind.com");
   const [password, setPassword] = useState("password");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login for this build
-    login("stub_jwt_token");
-    navigate("/dashboard");
+    setError("");
+    setIsLoading(true);
+    try {
+      // OAuth2 password flow requires form-encoded body
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const response = await api.post("/auth/login", formData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      });
+
+      if (response.data?.data?.access_token) {
+        login(response.data.data.access_token, response.data.data.user);
+        navigate("/dashboard");
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Invalid email or password.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -35,6 +58,11 @@ export function Login() {
           <p className="text-muted-foreground mt-2">Sign in to your MetricMind workspace</p>
         </div>
 
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
@@ -67,8 +95,8 @@ export function Login() {
             </div>
           </div>
 
-          <button type="submit" className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 mt-6">
-            Sign In <ArrowRight size={18} />
+          <button type="submit" disabled={isLoading} className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 mt-6 disabled:opacity-50">
+            {isLoading ? <Loader2 size={18} className="animate-spin" /> : (<>Sign In <ArrowRight size={18} /></>)}
           </button>
         </form>
 

@@ -1,19 +1,18 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import api from '../services/api';
 
 interface User {
-  id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  role_id: string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+  role_id?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string) => void;
+  login: (token: string, user?: User) => void;
   logout: () => void;
 }
 
@@ -24,34 +23,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for token and load user profile (placeholder)
     const token = localStorage.getItem('access_token');
-    if (token) {
-      // Simulate loading user profile
-      setUser({
-        id: '123',
-        email: 'admin@metricmind.com',
-        first_name: 'Admin',
-        last_name: 'User',
-        role_id: 'admin'
-      });
+    const storedUser = localStorage.getItem('user_data');
+    if (token && storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        // If user data is malformed, clear it
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+      }
     }
     setIsLoading(false);
   }, []);
 
-  const login = (token: string) => {
+  const login = (token: string, userData?: User) => {
     localStorage.setItem('access_token', token);
-    setUser({
-      id: '123',
-      email: 'admin@metricmind.com',
-      first_name: 'Admin',
-      last_name: 'User',
-      role_id: 'admin'
-    });
+    const userToStore = userData || { email: 'user@metricmind.com', name: 'User' };
+    localStorage.setItem('user_data', JSON.stringify(userToStore));
+    setUser(userToStore);
   };
 
   const logout = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user_data');
     setUser(null);
   };
 

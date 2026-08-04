@@ -3,6 +3,7 @@ import { MainLayout } from "./layouts/MainLayout";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { Landing } from "./pages/Landing";
 import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
 import { Placeholder } from "./pages/Placeholder";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -38,7 +39,7 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Placeholder title="Registration" />} />
+            <Route path="/register" element={<Register />} />
           </Route>
 
           {/* Protected Dashboard Routes */}

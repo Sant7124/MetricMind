@@ -138,12 +138,13 @@ export function Chat() {
                 </div>
               )}
               <div className={`max-w-[80%] rounded-2xl p-4 ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary/50 text-foreground border border-border'}`}>
-                <ReactMarkdown 
-                  components={{ code: ChartRenderer }}
-                  className="prose prose-sm dark:prose-invert max-w-none"
-                >
-                  {msg.content}
-                </ReactMarkdown>
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown 
+                    components={{ code: ChartRenderer }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
               </div>
               {msg.role === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center shrink-0 mt-1">

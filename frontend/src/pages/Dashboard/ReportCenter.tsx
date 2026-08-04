@@ -27,7 +27,10 @@ export function ReportCenter() {
             <h3 className="font-semibold mb-1">{report.name}</h3>
             <p className="text-xs text-muted-foreground mb-4">Generated: {report.date}</p>
             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-secondary hover:bg-secondary/80 rounded text-xs font-medium">
+              <button 
+                onClick={() => window.open(`http://localhost:8001/api/v1/export/csv?report_type=${encodeURIComponent(report.name)}`, '_blank')}
+                className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-secondary hover:bg-secondary/80 rounded text-xs font-medium"
+              >
                 <Download size={14} /> {report.type}
               </button>
               <button className="p-1.5 bg-secondary hover:bg-secondary/80 rounded text-muted-foreground hover:text-foreground">
