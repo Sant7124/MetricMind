@@ -18,7 +18,8 @@ import {
   LogOut,
   User,
   PieChart,
-  Shield
+  Shield,
+  Activity
 } from "lucide-react";
 
 export function DashboardLayout() {
@@ -40,6 +41,7 @@ export function DashboardLayout() {
   ];
 
   const adminNavigation = [
+    { name: 'System Monitor', href: '/dashboard/admin/monitor', icon: Activity },
     { name: 'User Management', href: '/dashboard/admin/users', icon: Users },
     { name: 'Audit Center', href: '/dashboard/admin/audit', icon: Shield },
     { name: 'System Settings', href: '/dashboard/admin/settings', icon: Settings },
