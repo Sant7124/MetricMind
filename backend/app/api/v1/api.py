@@ -19,4 +19,8 @@ api_router.include_router(analytics.router, prefix="/analytics", tags=["analytic
 api_router.include_router(export.router, prefix="/export", tags=["export"])
 api_router.include_router(chat.router, prefix="/chat", tags=["chat"])
 
+@api_router.get("/")
+async def api_root():
+    return {"status": "success", "message": "MetricMind API v1 is running", "data": None}
+
 
