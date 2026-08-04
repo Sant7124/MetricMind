@@ -1,73 +1,114 @@
-# MetricMind: Agentic Semantic BI Engine
+# MetricMind
+**Enterprise Agentic Semantic BI Engine**
 
-An enterprise-grade conversational Business Intelligence platform. This repository contains the foundational scaffolding for both the Frontend (React 19 + Vite + TailwindCSS) and Backend (FastAPI + SQLAlchemy + PostgreSQL).
+![MetricMind Architecture](https://via.placeholder.com/1200x600.png?text=MetricMind+Enterprise+Architecture)
 
-## Features
-- **Administration Console**: User management, RBAC, and global system configuration settings.
-- **Enterprise Observability**: Audit Center for tracking user activity and Query Inspector for transparent AI-to-SQL validation logging.
-- **Advanced Dashboarding**: Slot-based custom dashboard builder and dedicated tabular Report Center.
-- **Conversational BI Engine**: Natural language querying powered by an Agentic LLM Orchestrator that strictly adheres to metric governance.
-- **Data Catalog**: Searchable business glossary detailing metric ownership and semantic formulas.
-- **Dynamic AI Visualizations**: LLM-driven chart recommendations rendered seamlessly in the chat stream.
-- **Semantic Layer**: Custom governed metrics engine ensuring single-source-of-truth definitions for business KPIs.
-- **Enterprise Query Engine**: Dynamic SQL generator with semantic validation, permission checks, and SQL injection prevention.
-- **Modern Enterprise SaaS UI**: Glassmorphism, ChatGPT-like interface, responsive layouts built with TailwindCSS and Framer Motion.
+MetricMind is a production-grade, Agentic Conversational Business Intelligence platform. It completely reimagines how enterprises query and interact with their data by placing a strict Semantic Engine between the LLM and the Data Warehouse. The AI NEVER writes raw SQL; it only navigates governed business metrics.
 
+---
 
+## 🚀 Enterprise Features
 
+### 1. Semantic Query Engine (Governance)
+- **Single Source of Truth**: Define metrics (e.g., `Gross Margin`, `Net Revenue`) centrally in YAML/JSON.
+- **Strict Validation**: Users and AI cannot query combinations of metrics/dimensions that are semantically invalid.
+- **SQL Injection Prevention**: All queries are dynamically parameterized and routed through SQLAlchemy Core.
 
-## Folder Structure
+### 2. Conversational BI (Agentic AI)
+- **Natural Language to JSON**: AI interprets intent and extracts business parameters, passing them to the Semantic Layer.
+- **Dynamic Render Engine**: AI responses embed custom markdown tokens (` ```json { "type": "chart" } ``` `) which the React frontend instantly transforms into interactive Recharts visualizations.
+- **Provider Agnostic**: Easily swap between Gemini, OpenAI, or Local LLMs via the Admin Panel.
+
+### 3. Analytics & Visualization
+- **Executive Dashboards**: Real-time KPI cards with mini sparklines, trend arrows, and complex tooltips.
+- **Custom Dashboard Builder**: Slot-based grid allowing users to construct their own BI views.
+- **Data Catalog**: Searchable business glossary for non-technical users to understand formulas.
+
+### 4. Administration & Observability
+- **Role-Based Access Control (RBAC)**: Deep user management (Super Admin, Executive, Analyst).
+- **Query Inspector**: A transparent observability tool that proves to executives exactly what SQL the AI generated and how long it took.
+- **Audit Center**: Global enterprise security logging (Logins, Exports, Role Changes).
+- **System Monitoring**: Live telemetry of CPU, Memory, DB latency, and active sessions.
+
+---
+
+## 🏗️ Architecture Stack
+
+### Frontend
+- **React 19** + **Vite**
+- **TailwindCSS** + Glassmorphism UI
+- **Framer Motion** (Micro-animations)
+- **Recharts** (Enterprise Visualizations)
+- **React Router** (Protected/Public flows)
+
+### Backend
+- **FastAPI** (Async Python 3.11+)
+- **SQLAlchemy 2.0** (Core + ORM)
+- **PostgreSQL** (Primary Data Warehouse & App DB)
+- **Pytest** (Automated Testing)
+
+---
+
+## 📂 Project Structure
 
 ```
 MetricMind/
-├── .env                  # Overarching configuration
-├── backend/              # FastAPI Application
+├── backend/
 │   ├── app/
-│   │   ├── api/          # REST endpoints
-│   │   ├── auth/         # JWT utilities
-│   │   ├── core/         # Settings, exceptions
-│   │   ├── database/     # DB connection
-│   │   ├── models/       # SQLAlchemy models
-│   │   ├── schemas/      # Pydantic validation
-│   │   └── utils/        # Helpers
-│   ├── migrations/       # Alembic migrations
-│   └── alembic.ini
-├── frontend/             # React Application
+│   │   ├── ai/            # Orchestrator, Prompts, LLM Providers
+│   │   ├── api/v1/        # Admin, Audit, Catalog, Governance, Chat APIs
+│   │   ├── core/          # Config, Security, JWT
+│   │   ├── db/            # Database Sessions, Migrations
+│   │   ├── models/        # SQLAlchemy Models
+│   │   ├── query_engine/  # Safe SQL Generation & Validation
+│   │   ├── semantic/      # Governed Metric Definitions
+│   │   └── warehouse/     # Data Warehouse Adapters (Postgres, Snowflake)
+│   ├── tests/             # Unit and Integration Tests
+│   └── requirements.txt
+├── frontend/
 │   ├── src/
-│   │   ├── components/   # Reusable UI
-│   │   ├── contexts/     # React Contexts (Theme, Auth)
-│   │   ├── layouts/      # Dashboard and Main Layouts
-│   │   ├── pages/        # Views
-│   │   ├── services/     # API integration (Axios)
-│   │   └── styles/       # Global CSS
-│   ├── tailwind.config.js
-│   └── vite.config.ts
+│   │   ├── components/    # Reusable UI (ErrorBoundary, Cards)
+│   │   ├── contexts/      # AuthContext, ThemeContext
+│   │   ├── layouts/       # DashboardLayout (Sidebar, Topbar)
+│   │   ├── pages/         # Admin, Dashboard, Chat UIs
+│   │   └── services/      # Axios API Client
+│   └── package.json
 └── README.md
 ```
 
-## Environment Variables
-The `.env` file at the root handles variables for both systems. 
-- `SQLALCHEMY_DATABASE_URI` must point to your PostgreSQL instance.
-- Ensure `SECRET_KEY` is set securely.
+---
 
-## Run Instructions
+## ⚙️ Installation & Deployment
 
-### Prerequisites
-- Node.js 18+
-- Python 3.11+
-- PostgreSQL database
+### 1. Environment Variables
+Create a `.env` in `backend/`:
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/metricmind
+GEMINI_API_KEY=your_key_here
+SECRET_KEY=super_secret_jwt_key
+```
 
-### Backend
-1. Navigate to `backend/`
-2. Activate virtual environment: `.\venv\Scripts\activate` (Windows)
-3. Apply migrations: `alembic upgrade head`
-4. Run server: `uvicorn app.main:app --reload`
-   - API Docs available at `http://localhost:8000/docs`
+### 2. Run Backend
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
 
-### Frontend
-1. Navigate to `frontend/`
-2. Install dependencies: `npm install`
-3. Run dev server: `npm run dev`
-   - Application available at `http://localhost:5173`
+### 3. Run Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-*Note: AI, semantic layer, and warehousing integrations are marked with TODOs for subsequent implementation phases.*
+---
+
+## 🛡️ Security & Performance
+- **Global Error Boundaries**: Graceful React fallbacks on crash.
+- **FastAPI Exception Handlers**: Strips tracebacks from production API errors.
+- **Memoization**: Heavy chart components are wrapped in `React.memo` to prevent re-renders during Chat streaming.
+- **Rate Limiting & CORS**: Restricted cross-origin resource sharing configured.
+
+---
+*Developed by Advanced Agentic Engineering Team*
