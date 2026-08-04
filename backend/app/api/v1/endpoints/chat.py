@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 
 from app.utils.responses import success_response, error_response, APIResponse
@@ -10,7 +10,7 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     message: str
-    conversation_id: str = None
+    conversation_id: Optional[str] = None
 
 @router.post("/", response_model=APIResponse)
 async def chat(request: ChatRequest):
@@ -19,9 +19,11 @@ async def chat(request: ChatRequest):
         
         ConversationMemory.add_message(conv_id, "user", request.message)
         
-        # In a real implementation, we would pass the conversation history to the orchestrator
-        # for context resolution (e.g. "Now only Europe").
-        response_text = await orchestrator.process_chat(request.message, history=[])
+        conv = ConversationMemory.get_conversation(conv_id)
+        history = [{"role": m.role, "content": m.content} for m in conv.messages[:-1]] if conv else []
+        
+        # Hardcoding Admin role for this demo to bypass RBAC 
+        response_text = await orchestrator.process_chat(request.message, history=history, user_role="Admin")
         
         ConversationMemory.add_message(conv_id, "assistant", response_text)
         
