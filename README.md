@@ -3,13 +3,16 @@
 An enterprise-grade conversational Business Intelligence platform. This repository contains the foundational scaffolding for both the Frontend (React 19 + Vite + TailwindCSS) and Backend (FastAPI + SQLAlchemy + PostgreSQL).
 
 ## Features
+- **Administration Console**: User management, RBAC, and global system configuration settings.
+- **Enterprise Observability**: Audit Center for tracking user activity and Query Inspector for transparent AI-to-SQL validation logging.
+- **Advanced Dashboarding**: Slot-based custom dashboard builder and dedicated tabular Report Center.
 - **Conversational BI Engine**: Natural language querying powered by an Agentic LLM Orchestrator that strictly adheres to metric governance.
-- **Dynamic AI Visualizations**: LLM-driven chart recommendations rendered seamlessly in the chat stream via custom Markdown-to-Recharts parsing.
+- **Data Catalog**: Searchable business glossary detailing metric ownership and semantic formulas.
+- **Dynamic AI Visualizations**: LLM-driven chart recommendations rendered seamlessly in the chat stream.
 - **Semantic Layer**: Custom governed metrics engine ensuring single-source-of-truth definitions for business KPIs.
-- **Warehouse Abstraction**: Query execution engine supporting PostgreSQL with adapter stubs for Snowflake and BigQuery.
 - **Enterprise Query Engine**: Dynamic SQL generator with semantic validation, permission checks, and SQL injection prevention.
 - **Modern Enterprise SaaS UI**: Glassmorphism, ChatGPT-like interface, responsive layouts built with TailwindCSS and Framer Motion.
-- **Analytics Dashboards**: Interactive Executive and Revenue dashboards powered by Recharts.
+
 
 
 
