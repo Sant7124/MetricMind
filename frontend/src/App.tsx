@@ -14,6 +14,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   
 import { ExecutiveDashboard } from "./pages/Dashboard/ExecutiveDashboard";
 import { RevenueDashboard } from "./pages/Dashboard/RevenueDashboard";
+import { Chat } from "./pages/Dashboard/Chat";
 
 function App() {
   return (
@@ -37,8 +38,9 @@ function App() {
         >
           <Route index element={<ExecutiveDashboard />} />
           <Route path="revenue" element={<RevenueDashboard />} />
-          <Route path="chat" element={<Placeholder title="AI Semantic Chat" />} />
+          <Route path="chat" element={<Chat />} />
           <Route path="metrics" element={<Placeholder title="Metrics & Definitions" />} />
+
 
           <Route path="reports" element={<Placeholder title="Reports Engine" />} />
           <Route path="semantic-layer" element={<Placeholder title="Semantic Layer Config" />} />
