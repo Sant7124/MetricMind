@@ -51,7 +51,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         access_token = create_access_token(subject=user.email)
         
         return success_response(
-            data={"access_token": access_token, "token_type": "bearer", "user": {"email": user.email, "name": f"{user.first_name} {user.last_name}"}}, 
+            data={
+                "access_token": access_token, 
+                "token_type": "bearer", 
+                "user": {
+                    "email": user.email, 
+                    "name": f"{user.first_name} {user.last_name}",
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "role_id": str(user.role_id) if user.role_id else "user"
+                }
+            }, 
             message="Login successful"
         )
 
