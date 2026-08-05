@@ -125,6 +125,25 @@ export function Chat() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col glass rounded-xl border border-border relative overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          
+          {messages.length === 1 && (
+            <div className="mb-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
+              <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+                <LayoutDashboard size={20} /> Proactive AI Insights
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-background/50 rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors">
+                  <p className="text-sm font-medium mb-1">Profit Margin Alert</p>
+                  <p className="text-xs text-muted-foreground">Logistics costs in NA increased by 8% this week, impacting gross margin.</p>
+                </div>
+                <div className="p-4 bg-background/50 rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors">
+                  <p className="text-sm font-medium mb-1">Sales Forecast</p>
+                  <p className="text-xs text-muted-foreground">You are on track to beat Q3 targets by 12% based on current pipeline velocity.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {messages.map((msg, i) => (
             <motion.div 
               initial={{ opacity: 0, y: 10 }} 
@@ -137,7 +156,7 @@ export function Chat() {
                   <Bot size={18} />
                 </div>
               )}
-              <div className={`max-w-[80%] rounded-2xl p-4 ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary/50 text-foreground border border-border'}`}>
+              <div className={`max-w-[80%] rounded-2xl p-4 ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary/50 text-foreground border border-border shadow-sm'}`}>
                 <div className="prose prose-sm dark:prose-invert max-w-none">
                   <ReactMarkdown 
                     components={{ code: ChartRenderer }}
@@ -169,7 +188,26 @@ export function Chat() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-background/50 border-t border-border backdrop-blur-sm">
+        <div className="p-4 bg-background/80 border-t border-border backdrop-blur-md">
+          <div className="mb-3 px-1">
+            <p className="text-xs text-muted-foreground mb-2 font-medium">Suggested queries:</p>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {[
+                { text: "Show monthly revenue", icon: "📊" },
+                { text: "Why did profit margin drop?", icon: "📉" },
+                { text: "Top 5 products by region", icon: "🏆" },
+                { text: "Forecast next month sales", icon: "🔮" }
+              ].map(suggestion => (
+                <button 
+                  key={suggestion.text}
+                  onClick={() => setInput(suggestion.text)}
+                  className="whitespace-nowrap px-3 py-1.5 text-xs bg-secondary/30 hover:bg-secondary border border-border hover:border-primary/50 rounded-full transition-all flex items-center gap-1.5"
+                >
+                  <span>{suggestion.icon}</span> {suggestion.text}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="relative flex items-center">
             <input
               type="text"
@@ -177,26 +215,15 @@ export function Chat() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Ask a question about your business data..."
-              className="w-full bg-secondary/50 border border-border rounded-full pl-6 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              className="w-full bg-secondary/50 border border-border rounded-full pl-6 pr-12 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-inner"
             />
             <button 
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="absolute right-2 p-2 bg-primary text-primary-foreground rounded-full disabled:opacity-50 hover:bg-primary/90 transition-colors"
+              className="absolute right-2 p-2.5 bg-primary text-primary-foreground rounded-full disabled:opacity-50 hover:bg-primary/90 transition-colors shadow-md"
             >
               <Send size={16} />
             </button>
-          </div>
-          <div className="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide">
-            {["Show monthly revenue", "Why did profit margin drop?", "Top 5 products by region"].map(suggestion => (
-              <button 
-                key={suggestion}
-                onClick={() => setInput(suggestion)}
-                className="whitespace-nowrap px-3 py-1.5 text-xs bg-secondary/30 hover:bg-secondary border border-border rounded-full transition-colors"
-              >
-                {suggestion}
-              </button>
-            ))}
           </div>
         </div>
       </div>
