@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { DollarSign, ShoppingCart, Users, TrendingUp, TrendingDown } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, TrendingUp, TrendingDown, Sparkles, Activity, ArrowRight, Clock } from "lucide-react";
 import api from "../../services/api";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -167,6 +167,93 @@ export function ExecutiveDashboard() {
                 <Bar dataKey="profit" fill="hsl(var(--indigo-500))" radius={[4, 4, 0, 0]} name="Gross Profit" />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Interactive Bottom Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+        
+        {/* AI Insights Panel */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="lg:col-span-1 glass p-6 rounded-xl border border-border relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Sparkles size={100} />
+          </div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-primary/20 text-primary flex items-center justify-center">
+              <Sparkles size={20} />
+            </div>
+            <h3 className="text-lg font-semibold">AI Executive Insights</h3>
+          </div>
+          
+          <div className="space-y-4 relative z-10">
+            <div className="p-4 rounded-lg bg-secondary/50 border border-border/50 hover:border-primary/50 transition-colors cursor-pointer">
+              <p className="text-sm">Revenue is projected to grow by <span className="font-bold text-emerald-500">14.2%</span> next month based on current trajectory.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-secondary/50 border border-border/50 hover:border-primary/50 transition-colors cursor-pointer">
+              <p className="text-sm">Customer retention in the <span className="font-bold text-blue-400">Enterprise</span> segment has improved by 4% over the last quarter.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-secondary/50 border border-border/50 hover:border-primary/50 transition-colors cursor-pointer">
+              <p className="text-sm">Action required: <span className="font-bold text-destructive">2 high-value</span> deals are stalled in negotiation phase.</p>
+            </div>
+          </div>
+          
+          <button className="mt-6 w-full py-2.5 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground font-medium text-sm transition-all flex items-center justify-center gap-2">
+            Ask MetricMind AI <ArrowRight size={16} />
+          </button>
+        </motion.div>
+
+        {/* Recent Activity Feed */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="lg:col-span-2 glass p-6 rounded-xl border border-border">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+                <Activity size={20} />
+              </div>
+              <h3 className="text-lg font-semibold">Live Transaction Feed</h3>
+            </div>
+            <button className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+              View All <ArrowRight size={14} />
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-muted-foreground uppercase bg-secondary/30">
+                <tr>
+                  <th className="px-4 py-3 rounded-tl-lg rounded-bl-lg font-medium">Customer</th>
+                  <th className="px-4 py-3 font-medium">Amount</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 rounded-tr-lg rounded-br-lg font-medium">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { name: "Acme Corp", amount: "$12,450.00", status: "Completed", time: "2 mins ago", color: "emerald" },
+                  { name: "TechFlow Inc.", amount: "$8,230.50", status: "Processing", time: "15 mins ago", color: "blue" },
+                  { name: "Global Systems", amount: "$24,100.00", status: "Completed", time: "1 hour ago", color: "emerald" },
+                  { name: "Nexus Dynamics", amount: "$3,450.00", status: "Pending", time: "3 hours ago", color: "amber" },
+                ].map((tx, idx) => (
+                  <tr key={idx} className="border-b border-border/50 hover:bg-secondary/20 transition-colors group cursor-pointer">
+                    <td className="px-4 py-3 font-medium flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold">
+                        {tx.name.charAt(0)}
+                      </div>
+                      {tx.name}
+                    </td>
+                    <td className="px-4 py-3 font-bold">{tx.amount}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium bg-${tx.color}-500/10 text-${tx.color}-500`}>
+                        {tx.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground flex items-center gap-1">
+                      <Clock size={12} /> {tx.time}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </motion.div>
       </div>
