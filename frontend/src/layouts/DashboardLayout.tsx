@@ -1,6 +1,9 @@
+import { useState, useRef, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { UserAvatar } from "../components/UserAvatar";
 import { 
   LayoutDashboard, 
   MessageSquare, 
@@ -26,6 +29,25 @@ export function DashboardLayout() {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
+
+  const [showTopProfile, setShowTopProfile] = useState(false);
+  const [showSideProfile, setShowSideProfile] = useState(false);
+  
+  const topProfileRef = useRef<HTMLDivElement>(null);
+  const sideProfileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (topProfileRef.current && !topProfileRef.current.contains(event.target as Node)) {
+        setShowTopProfile(false);
+      }
+      if (sideProfileRef.current && !sideProfileRef.current.contains(event.target as Node)) {
+        setShowSideProfile(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const analyticsNavigation = [
     { name: 'Executive Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -99,22 +121,52 @@ export function DashboardLayout() {
           </nav>
         </div>
 
-        <div className="p-4 border-t border-border">
-          <div className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-secondary transition-colors">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <User size={16} className="text-primary" />
-            </div>
+        <div className="p-4 border-t border-border relative" ref={sideProfileRef}>
+          <div 
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-secondary transition-colors cursor-pointer group"
+            onClick={() => setShowSideProfile(!showSideProfile)}
+          >
+            <UserAvatar user={user} className="w-9 h-9 ring-2 ring-transparent group-hover:ring-primary/20 transition-all" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{user?.first_name} {user?.last_name}</p>
               <p className="text-xs text-muted-foreground truncate">{user?.role_id}</p>
             </div>
-            <LogOut size={16} className="text-muted-foreground hover:text-destructive cursor-pointer" onClick={logout} />
           </div>
+
+          <AnimatePresence>
+            {showSideProfile && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="absolute bottom-full left-4 mb-2 w-56 glass border border-border rounded-xl shadow-2xl z-50 overflow-hidden"
+              >
+                <div className="p-4 border-b border-border bg-secondary/30 flex items-center gap-3">
+                  <UserAvatar user={user} className="w-10 h-10" textClass="text-base" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate">{user?.first_name} {user?.last_name}</p>
+                    <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                  </div>
+                </div>
+                <div className="p-2">
+                  <Link to="/dashboard/profile" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-secondary transition-colors" onClick={() => setShowSideProfile(false)}>
+                    <User size={16} className="text-muted-foreground" /> My Profile
+                  </Link>
+                </div>
+                <div className="p-2 border-t border-border">
+                  <button onClick={logout} className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-destructive/10 text-destructive transition-colors">
+                    <LogOut size={16} /> Sign out
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 ml-64 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Navbar */}
         <header className="h-16 border-b glass sticky top-0 z-30 flex items-center justify-between px-6">
           <div className="flex-1 flex items-center">
@@ -140,17 +192,54 @@ export function DashboardLayout() {
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <div className="h-8 w-px bg-border mx-2"></div>
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col items-end">
-                <span className="text-sm font-medium">{user?.first_name} {user?.last_name}</span>
-                <span className="text-xs text-muted-foreground capitalize">{user?.role_id}</span>
+            <div className="relative" ref={topProfileRef}>
+              <div 
+                className="flex items-center gap-3 cursor-pointer hover:bg-secondary/50 p-1.5 rounded-xl transition-colors group"
+                onClick={() => setShowTopProfile(!showTopProfile)}
+              >
+                <div className="flex flex-col items-end">
+                  <span className="text-sm font-medium">{user?.first_name} {user?.last_name}</span>
+                  <span className="text-xs text-muted-foreground capitalize">{user?.role_id}</span>
+                </div>
+                <UserAvatar user={user} className="w-10 h-10 ring-2 ring-border group-hover:ring-primary/50 transition-all shadow-md" textClass="text-base" />
               </div>
-              <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-semibold">
-                {user?.first_name?.[0]}{user?.last_name?.[0]}
-              </div>
-              <button onClick={logout} className="p-2 rounded-full hover:bg-secondary transition-colors text-muted-foreground hover:text-destructive ml-2">
-                <LogOut size={18} />
-              </button>
+
+              <AnimatePresence>
+                {showTopProfile && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-64 glass border border-border rounded-xl shadow-2xl z-50 overflow-hidden"
+                  >
+                    <div className="p-4 border-b border-border bg-secondary/30 flex items-center gap-3">
+                      <UserAvatar user={user} className="w-12 h-12" textClass="text-lg" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold truncate text-foreground">{user?.first_name} {user?.last_name}</p>
+                        <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
+                          <Shield size={12} />
+                          {user?.role_id}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-2">
+                      <Link to="/dashboard/profile" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-secondary transition-colors" onClick={() => setShowTopProfile(false)}>
+                        <User size={16} className="text-muted-foreground" /> My Profile
+                      </Link>
+                      <Link to="/dashboard/admin/settings" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-secondary transition-colors" onClick={() => setShowTopProfile(false)}>
+                        <Settings size={16} className="text-muted-foreground" /> Settings
+                      </Link>
+                    </div>
+                    <div className="p-2 border-t border-border">
+                      <button onClick={logout} className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-destructive/10 text-destructive transition-colors">
+                        <LogOut size={16} /> Sign out
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>
