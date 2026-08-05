@@ -90,6 +90,69 @@ export function RevenueDashboard() {
           </ResponsiveContainer>
         )}
       </motion.div>
+
+      {/* New Interactive Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+        {/* Top Selling Products */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="lg:col-span-2 glass p-6 rounded-xl border border-border">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold">Top Selling Products</h3>
+            <button className="text-sm text-primary hover:underline">View Full Catalog</button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-muted-foreground uppercase bg-secondary/30">
+                <tr>
+                  <th className="px-4 py-3 rounded-tl-lg font-medium">Product</th>
+                  <th className="px-4 py-3 font-medium">Category</th>
+                  <th className="px-4 py-3 font-medium">Revenue</th>
+                  <th className="px-4 py-3 font-medium">Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { name: "Enterprise SaaS License", cat: "Software", rev: "$450,200", trend: "+12%" },
+                  { name: "Cloud Storage Tier 3", cat: "Infrastructure", rev: "$210,500", trend: "+5%" },
+                  { name: "Premium Support Plan", cat: "Services", rev: "$125,000", trend: "-2%" },
+                  { name: "API Gateway Overage", cat: "Infrastructure", rev: "$85,400", trend: "+24%" }
+                ].map((item, i) => (
+                  <tr key={i} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                    <td className="px-4 py-3 font-medium">{item.name}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{item.cat}</td>
+                    <td className="px-4 py-3 font-bold">{item.rev}</td>
+                    <td className={`px-4 py-3 font-medium ${item.trend.startsWith('+') ? 'text-emerald-500' : 'text-destructive'}`}>
+                      {item.trend}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+
+        {/* Revenue Anomalies */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="lg:col-span-1 glass p-6 rounded-xl border border-border relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <DollarSign size={100} />
+          </div>
+          <h3 className="text-lg font-semibold mb-4 text-amber-500 flex items-center gap-2">
+            AI Anomaly Detection
+          </h3>
+          <div className="space-y-4 relative z-10">
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <p className="text-sm text-amber-500 font-medium mb-1">Unusual Churn Spike</p>
+              <p className="text-xs text-muted-foreground">Detected a 15% drop in recurring revenue from the EMEA region over the last 48 hours.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-sm text-emerald-500 font-medium mb-1">Upsell Opportunity</p>
+              <p className="text-xs text-muted-foreground">30% of users on the 'Pro' plan are near their API limits. Consider automated upsell campaign.</p>
+            </div>
+            <button className="w-full mt-2 py-2 text-sm font-medium border border-border rounded-lg hover:bg-secondary transition-colors">
+              Run Deep Analysis
+            </button>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }
