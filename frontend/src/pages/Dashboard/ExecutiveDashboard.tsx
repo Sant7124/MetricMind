@@ -11,35 +11,40 @@ export function ExecutiveDashboard() {
   const [kpis, setKpis] = useState({ revenue: 0, orders: 0, customers: 0 });
   const [loading, setLoading] = useState(true);
 
-  // Dummy chart data for Phase 2 scaffold (would come from actual API based on dates)
-  const revenueData = [
-    { name: 'Jan', revenue: 4000, profit: 2400 },
-    { name: 'Feb', revenue: 3000, profit: 1398 },
-    { name: 'Mar', revenue: 2000, profit: 9800 },
-    { name: 'Apr', revenue: 2780, profit: 3908 },
-    { name: 'May', revenue: 1890, profit: 4800 },
-    { name: 'Jun', revenue: 2390, profit: 3800 },
-    { name: 'Jul', revenue: 3490, profit: 4300 },
-  ];
+  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchKPIs = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get("/analytics/dashboard/kpis");
-        if (response.data.status === "success") {
+        const [kpiRes, chartRes] = await Promise.all([
+          api.get("/analytics/dashboard/kpis"),
+          api.get("/analytics/dashboard/charts")
+        ]);
+        
+        if (kpiRes.data.status === "success") {
           setKpis({
-            revenue: parseFloat(response.data.data.total_revenue || 0),
-            orders: parseInt(response.data.data.total_orders || 0),
-            customers: parseInt(response.data.data.total_customers || 0)
+            revenue: parseFloat(kpiRes.data.data.total_revenue || 0),
+            orders: parseInt(kpiRes.data.data.total_orders || 0),
+            customers: parseInt(kpiRes.data.data.total_customers || 0)
           });
         }
+        
+        if (chartRes.data.status === "success") {
+          // Rename for the UI 
+          const formatted = chartRes.data.data.map((item: any) => ({
+            name: item.month,
+            revenue: item.revenue,
+            profit: item.gross
+          }));
+          setChartData(formatted);
+        }
       } catch (error) {
-        console.error("Failed to fetch KPIs:", error);
+        console.error("Failed to fetch dashboard data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchKPIs();
+    fetchData();
   }, []);
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
@@ -115,10 +120,10 @@ export function ExecutiveDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue vs Profit Area Chart */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass p-6 rounded-xl border border-border">
-          <h3 className="text-lg font-semibold mb-6">Revenue vs Profit (YTD)</h3>
+          <h3 className="text-lg font-semibold mb-6">Revenue vs Profit (Last 12 Months)</h3>
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
@@ -138,7 +143,7 @@ export function ExecutiveDashboard() {
                 />
                 <Legend />
                 <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorRevenue)" name="Revenue" />
-                <Area type="monotone" dataKey="profit" stroke="#10b981" fillOpacity={1} fill="url(#colorProfit)" name="Profit" />
+                <Area type="monotone" dataKey="profit" stroke="#10b981" fillOpacity={1} fill="url(#colorProfit)" name="Gross Profit" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -146,20 +151,20 @@ export function ExecutiveDashboard() {
 
         {/* Region Sales Bar Chart */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass p-6 rounded-xl border border-border">
-          <h3 className="text-lg font-semibold mb-6">Sales by Region</h3>
+          <h3 className="text-lg font-semibold mb-6">Sales by Month</h3>
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value/1000}k`} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
                   cursor={{fill: 'hsl(var(--secondary))'}}
                 />
                 <Legend />
-                <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="North America" />
-                <Bar dataKey="profit" fill="hsl(var(--indigo-500))" radius={[4, 4, 0, 0]} name="Europe" />
+                <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Revenue" />
+                <Bar dataKey="profit" fill="hsl(var(--indigo-500))" radius={[4, 4, 0, 0]} name="Gross Profit" />
               </BarChart>
             </ResponsiveContainer>
           </div>

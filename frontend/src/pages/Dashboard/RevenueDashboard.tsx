@@ -4,26 +4,31 @@ import { DollarSign, ArrowUpRight, ArrowDownRight, Filter } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
 } from "recharts";
+import api from "../../services/api";
 
 export function RevenueDashboard() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real implementation, this hits the /analytics/query endpoint
-    // with metrics=["Revenue", "Gross Revenue"] and dimensions=["Time"]
-    setTimeout(() => {
-      setData([
-        { month: 'Jan', revenue: 4000, gross: 5000 },
-        { month: 'Feb', revenue: 3000, gross: 3500 },
-        { month: 'Mar', revenue: 2000, gross: 2500 },
-        { month: 'Apr', revenue: 2780, gross: 3200 },
-        { month: 'May', revenue: 1890, gross: 2200 },
-        { month: 'Jun', revenue: 2390, gross: 2900 },
-        { month: 'Jul', revenue: 3490, gross: 4200 },
-      ] as any);
-      setLoading(false);
-    }, 500);
+    const fetchCharts = async () => {
+      try {
+        const response = await api.get("/analytics/dashboard/charts");
+        if (response.data.status === "success") {
+          const formatted = response.data.data.map((item: any) => ({
+            month: item.month,
+            revenue: item.revenue,
+            gross: item.gross
+          }));
+          setData(formatted);
+        }
+      } catch (error) {
+        console.error("Failed to load charts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCharts();
   }, []);
 
   return (
