@@ -179,6 +179,51 @@ export function SystemMonitor() {
           </div>
         </div>
       </div>
+
+      {/* NEW CONTENT: System Alerts Log & Worker Status */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+        <div className="lg:col-span-2 glass p-6 rounded-xl border border-border">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+             System Alerts Log
+          </h3>
+          <div className="space-y-3">
+            {[
+              { type: 'warning', msg: 'High CPU utilization detected on worker-node-03', time: '12 mins ago' },
+              { type: 'error', msg: 'Failed to connect to secondary cache redis-replica', time: '1 hr ago' },
+              { type: 'info', msg: 'Automated backup completed successfully', time: '4 hrs ago' },
+              { type: 'warning', msg: 'API rate limit threshold approaching for Tenant A', time: '5 hrs ago' }
+            ].map((alert, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 bg-secondary/20 rounded-lg border border-border/50">
+                <div className={`w-2 h-2 rounded-full ${alert.type === 'error' ? 'bg-destructive' : alert.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+                <span className="flex-1 text-sm">{alert.msg}</span>
+                <span className="text-xs text-muted-foreground">{alert.time}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-xl border border-border">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+             Background Workers
+          </h3>
+          <div className="space-y-4">
+            {[
+              { name: 'Analytics Aggregation', status: 'Running', load: '65%' },
+              { name: 'Semantic Sync', status: 'Idle', load: '0%' },
+              { name: 'Email Dispatcher', status: 'Running', load: '22%' },
+              { name: 'Data Ingestion', status: 'Processing', load: '94%' }
+            ].map((worker, i) => (
+              <div key={i} className="flex justify-between items-center text-sm border-b border-border/50 pb-2 last:border-0 last:pb-0">
+                <div>
+                  <div className="font-medium">{worker.name}</div>
+                  <div className={`text-xs ${worker.status === 'Running' || worker.status === 'Processing' ? 'text-emerald-500' : 'text-muted-foreground'}`}>{worker.status}</div>
+                </div>
+                <div className="font-mono text-xs">{worker.load}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

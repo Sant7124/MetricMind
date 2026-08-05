@@ -153,6 +153,57 @@ export function RevenueDashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* NEW CONTENT: Subscription Tiers & Region Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="glass p-6 rounded-xl border border-border">
+          <h3 className="text-lg font-semibold mb-6">Revenue by Subscription Tier</h3>
+          <div className="space-y-6">
+            {[
+              { tier: "Enterprise", percentage: 55, amount: "$24.8M" },
+              { tier: "Professional", percentage: 30, amount: "$13.5M" },
+              { tier: "Starter", percentage: 10, amount: "$4.5M" },
+              { tier: "Legacy", percentage: 5, amount: "$2.2M" }
+            ].map((sub, idx) => (
+              <div key={idx} className="space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-medium text-muted-foreground">{sub.tier}</span>
+                  <span className="font-bold">{sub.amount}</span>
+                </div>
+                <div className="w-full bg-secondary rounded-full h-2.5">
+                  <div className="bg-primary h-2.5 rounded-full" style={{ width: `${sub.percentage}%` }}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="glass p-6 rounded-xl border border-border">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold">Failed Payments Log</h3>
+            <button className="text-xs px-3 py-1.5 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80">Export CSV</button>
+          </div>
+          <div className="space-y-4">
+            {[
+              { company: "Nexus Dynamics", reason: "Card Expired", amount: "$1,200", date: "Today" },
+              { company: "Acme Corp", reason: "Insufficient Funds", amount: "$4,500", date: "Yesterday" },
+              { company: "Global Systems", reason: "Fraud Suspected", amount: "$800", date: "2 days ago" },
+              { company: "TechFlow Inc.", reason: "Gateway Timeout", amount: "$3,200", date: "3 days ago" }
+            ].map((fail, idx) => (
+              <div key={idx} className="flex justify-between items-center p-3 rounded-lg bg-secondary/20 border border-border/50">
+                <div className="flex flex-col">
+                  <span className="font-medium text-sm">{fail.company}</span>
+                  <span className="text-xs text-destructive">{fail.reason}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="font-bold text-sm">{fail.amount}</span>
+                  <span className="text-xs text-muted-foreground">{fail.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

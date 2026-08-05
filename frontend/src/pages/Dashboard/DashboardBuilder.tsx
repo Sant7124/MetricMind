@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, LayoutGrid, Save, Settings, Database, CheckCircle, AlertTriangle, Layers, Copy } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, AreaChart, Area, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 const MOCK_DATA = [
   { name: 'Jan', value: 400 },
@@ -10,7 +10,13 @@ const MOCK_DATA = [
 ];
 
 export function DashboardBuilder() {
-  const [widgets, setWidgets] = useState([{ id: 1, type: 'bar', title: 'Sample Revenue' }]);
+  const [widgets, setWidgets] = useState([
+    { id: 1, type: 'bar', title: 'Monthly Revenue' },
+    { id: 2, type: 'area', title: 'Active Users (Live)' },
+    { id: 3, type: 'pie', title: 'Traffic Sources' },
+    { id: 4, type: 'line', title: 'Customer Growth' },
+    { id: 5, type: 'bar', title: 'Revenue vs Target' }
+  ]);
   
   const addWidget = () => {
     setWidgets([...widgets, { id: Date.now(), type: 'bar', title: 'New Widget' }]);
@@ -69,13 +75,40 @@ export function DashboardBuilder() {
                 </div>
                 <div className="flex-1 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={MOCK_DATA}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                      <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }} />
-                      <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
+                    {widget.type === 'bar' ? (
+                      <BarChart data={MOCK_DATA}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                        <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }} />
+                        <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    ) : widget.type === 'area' ? (
+                      <AreaChart data={MOCK_DATA}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                        <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }} />
+                        <Area type="monotone" dataKey="value" stroke="hsl(var(--emerald-500))" fill="hsl(var(--emerald-500))" fillOpacity={0.2} />
+                      </AreaChart>
+                    ) : widget.type === 'line' ? (
+                      <LineChart data={MOCK_DATA}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                        <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }} />
+                        <Line type="monotone" dataKey="value" stroke="hsl(var(--blue-500))" strokeWidth={3} />
+                      </LineChart>
+                    ) : (
+                      <PieChart>
+                        <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }} />
+                        <Pie data={MOCK_DATA} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
+                          {MOCK_DATA.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={['hsl(var(--primary))', 'hsl(var(--emerald-500))', 'hsl(var(--blue-500))', 'hsl(var(--amber-500))'][index % 4]} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    )}
                   </ResponsiveContainer>
                 </div>
               </div>
@@ -132,7 +165,35 @@ export function DashboardBuilder() {
                 <span className="text-muted-foreground">Access</span>
                 <span className="font-medium text-emerald-500">Public Link</span>
               </div>
+              <div className="flex justify-between items-center pt-2 border-t border-border/50">
+                <span className="text-muted-foreground">Grid Snap</span>
+                <div className="w-8 h-4 bg-primary rounded-full relative">
+                  <div className="absolute right-1 top-0.5 w-3 h-3 bg-white rounded-full"></div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div className="glass p-5 rounded-xl border border-border">
+            <h3 className="font-semibold mb-3 text-sm">Revision History</h3>
+            <div className="space-y-4">
+              {[
+                { version: "v2.4", user: "Admin", time: "2 hours ago" },
+                { version: "v2.3", user: "John D.", time: "Yesterday" },
+                { version: "v2.2", user: "System", time: "3 days ago" }
+              ].map((rev, i) => (
+                <div key={i} className="flex justify-between items-center text-sm">
+                  <div className="flex flex-col">
+                    <span className="font-medium">{rev.version}</span>
+                    <span className="text-xs text-muted-foreground">by {rev.user}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{rev.time}</span>
+                </div>
+              ))}
+            </div>
+            <button className="w-full mt-4 py-2 text-xs font-medium bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 transition-colors">
+              Restore Version
+            </button>
           </div>
         </div>
       </div>

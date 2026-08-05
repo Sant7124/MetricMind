@@ -257,6 +257,69 @@ export function ExecutiveDashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* NEW CONTENT: Advanced Regional breakdown & Growth metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-2">
+        {/* Geographic Performance */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="md:col-span-2 glass p-6 rounded-xl border border-border">
+          <h3 className="text-lg font-semibold mb-6">Regional Performance Map</h3>
+          <div className="space-y-4">
+            {[
+              { region: "North America", value: 65, rev: "$1.2M", growth: "+14%" },
+              { region: "Europe (EMEA)", value: 45, rev: "$850K", growth: "+8%" },
+              { region: "Asia Pacific", value: 30, rev: "$420K", growth: "+22%" },
+              { region: "Latin America", value: 15, rev: "$180K", growth: "+5%" },
+            ].map((reg, i) => (
+              <div key={i} className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">{reg.region}</span>
+                  <div className="flex gap-4">
+                    <span className="text-muted-foreground">{reg.rev}</span>
+                    <span className="text-emerald-500">{reg.growth}</span>
+                  </div>
+                </div>
+                <div className="w-full bg-secondary rounded-full h-2">
+                  <div className="bg-primary h-2 rounded-full" style={{ width: `${reg.value}%` }}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Operational Efficiency */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="glass p-6 rounded-xl border border-border flex flex-col justify-between">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Customer Acquisition Cost</h3>
+            <p className="text-sm text-muted-foreground">Average cost to acquire a new enterprise client.</p>
+          </div>
+          <div className="mt-6">
+            <div className="flex items-end gap-2 mb-2">
+              <h4 className="text-4xl font-bold">$1,240</h4>
+              <span className="text-sm text-emerald-500 font-medium pb-1">-12.5% vs last qtr</span>
+            </div>
+            <div className="w-full bg-emerald-500/10 h-16 rounded-lg flex items-center justify-center border border-emerald-500/20">
+              <span className="text-emerald-500 font-medium text-sm">Target: &lt; $1,500</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Current Churn */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="glass p-6 rounded-xl border border-border flex flex-col justify-between">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Platform Churn Rate</h3>
+            <p className="text-sm text-muted-foreground">Rolling 30-day user attrition.</p>
+          </div>
+          <div className="mt-6">
+            <div className="flex items-end gap-2 mb-2">
+              <h4 className="text-4xl font-bold">2.4%</h4>
+              <span className="text-sm text-destructive font-medium pb-1">+0.2% vs last qtr</span>
+            </div>
+            <div className="w-full bg-destructive/10 h-16 rounded-lg flex items-center justify-center border border-destructive/20">
+               <span className="text-destructive font-medium text-sm">Action required</span>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

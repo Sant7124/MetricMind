@@ -69,6 +69,31 @@ export function ReportCenter() {
               ))}
             </div>
           </div>
+
+          <div className="glass p-6 rounded-xl border border-border mt-6">
+            <h2 className="text-lg font-semibold mb-4">Automated Report Workflows</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { name: "Monthly Board Pack to S3", destination: "AWS S3", status: "Active" },
+                { name: "Daily Sales Sync to CRM", destination: "Salesforce", status: "Active" },
+                { name: "Weekly Churn Alerts", destination: "Slack #alerts", status: "Paused" },
+                { name: "Support Metrics Export", destination: "Zendesk", status: "Active" }
+              ].map((workflow, i) => (
+                <div key={i} className="p-4 bg-secondary/20 rounded-lg border border-border/50 flex justify-between items-center">
+                  <div>
+                    <h4 className="font-semibold text-sm">{workflow.name}</h4>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                       Target: {workflow.destination}
+                    </span>
+                  </div>
+                  <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded ${workflow.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                    {workflow.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <button className="mt-4 px-4 py-2 text-sm text-primary hover:underline font-medium">Manage Workflows &rarr;</button>
+          </div>
         </div>
 
         {/* Right Sidebar - Scheduled Deliveries */}
@@ -96,6 +121,64 @@ export function ReportCenter() {
             <button className="w-full mt-6 py-2 border border-border border-dashed rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-solid transition-all">
               + Schedule New Report
             </button>
+          </div>
+          <div className="glass p-5 rounded-xl border border-border mt-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Clock size={18} /> Recent Downloads
+            </h2>
+            <div className="space-y-4">
+              {[
+                { name: "Q2 Financials", format: "Excel", time: "10 mins ago", user: "Finance Lead" },
+                { name: "May Churn Report", format: "PDF", time: "1 hr ago", user: "Admin" },
+                { name: "Active Users List", format: "CSV", time: "3 hrs ago", user: "Marketing Dir" },
+              ].map((dl, i) => (
+                <div key={i} className="flex justify-between items-center text-sm p-3 bg-secondary/10 rounded-lg border border-border/30">
+                  <div className="flex flex-col">
+                    <span className="font-medium text-foreground">{dl.name}</span>
+                    <span className="text-xs text-muted-foreground">by {dl.user}</span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-xs font-semibold px-2 py-1 bg-secondary rounded text-primary">{dl.format}</span>
+                    <span className="text-xs text-muted-foreground mt-1">{dl.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="glass p-5 rounded-xl border border-border mt-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Star size={18} /> Report Analytics
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-xs mb-1 text-muted-foreground">
+                  <span>Executive Summary</span>
+                  <span>1.2k views</span>
+                </div>
+                <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[85%]"></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1 text-muted-foreground">
+                  <span>Q3 Regional Sales</span>
+                  <span>850 views</span>
+                </div>
+                <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[65%]"></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1 text-muted-foreground">
+                  <span>Customer Churn Analysis</span>
+                  <span>420 views</span>
+                </div>
+                <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[35%]"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
