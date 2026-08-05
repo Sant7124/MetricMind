@@ -16,7 +16,7 @@ async def register(user_in: UserCreate):
         stmt = select(User).where(User.email == user_in.email)
         result = await session.execute(stmt)
         if result.scalar_one_or_none():
-            return error_response("Email already registered", status_code=400)
+            raise HTTPException(status_code=400, detail="Email already registered")
             
         # Create real user in Database
         hashed_pw = get_password_hash(user_in.password)

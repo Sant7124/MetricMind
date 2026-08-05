@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -10,8 +10,14 @@ export function Login() {
   const [password, setPassword] = useState("password");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +35,6 @@ export function Login() {
 
       if (response.data?.data?.access_token) {
         login(response.data.data.access_token, response.data.data.user);
-        navigate("/dashboard");
       } else {
         setError("Login failed. Please try again.");
       }
