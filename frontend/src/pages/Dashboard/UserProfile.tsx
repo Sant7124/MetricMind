@@ -19,7 +19,7 @@ export function UserProfile() {
     <div className="space-y-6 max-w-6xl mx-auto w-full">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Profile</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">My Profile</h1>
           <p className="text-muted-foreground">Manage your enterprise account settings and view activity.</p>
         </div>
         <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">

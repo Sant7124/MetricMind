@@ -35,7 +35,7 @@ export function RevenueDashboard() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Revenue Dashboard</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Revenue Dashboard</h1>
           <p className="text-muted-foreground">Deep dive into revenue streams and gross income.</p>
         </div>
         <div className="flex items-center gap-3">

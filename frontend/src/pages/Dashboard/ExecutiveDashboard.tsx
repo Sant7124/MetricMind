@@ -53,7 +53,7 @@ export function ExecutiveDashboard() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Executive Summary</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Executive Summary</h1>
           <p className="text-muted-foreground">Governed metrics overview across all regions.</p>
         </div>
         <div className="flex items-center gap-2">
