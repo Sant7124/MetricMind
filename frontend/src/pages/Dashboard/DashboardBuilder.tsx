@@ -29,21 +29,6 @@ const SERVER_DATA = [
   { name: 'AP-South', load: 75 }, { name: 'AP-East', load: 30 },
 ];
 
-const CONVERSION_DATA = [
-  { name: 'Week 1', rate: 2.4 }, { name: 'Week 2', rate: 2.6 }, { name: 'Week 3', rate: 2.1 },
-  { name: 'Week 4', rate: 3.2 }, { name: 'Week 5', rate: 3.5 },
-];
-
-const CHURN_DATA = [
-  { name: 'Q1', churn: 5.2 }, { name: 'Q2', churn: 4.8 }, { name: 'Q3', churn: 4.1 }, { name: 'Q4', churn: 3.5 },
-];
-
-const SALES_TARGET_DATA = [
-  { name: 'Jan', sales: 4000, target: 4500 }, { name: 'Feb', sales: 3000, target: 3500 },
-  { name: 'Mar', sales: 5000, target: 4800 }, { name: 'Apr', sales: 4500, target: 4500 },
-  { name: 'May', sales: 6000, target: 5500 },
-];
-
 export function DashboardBuilder() {
   const [widgets, setWidgets] = useState([
     { id: 1, type: 'bar', title: 'Monthly Revenue', data: REVENUE_DATA, dataKey: 'value', color: 'hsl(var(--primary))' },
@@ -51,9 +36,6 @@ export function DashboardBuilder() {
     { id: 3, type: 'area', title: 'Server Sessions', data: SESSION_DATA, dataKey: 'sessions', color: '#f59e0b' },
     { id: 4, type: 'pie', title: 'Traffic Sources', data: PIE_DATA, dataKey: 'value', color: '' },
     { id: 5, type: 'bar', title: 'Server Load (%)', data: SERVER_DATA, dataKey: 'load', color: '#ef4444' },
-    { id: 6, type: 'line', title: 'Weekly Conversion Rate', data: CONVERSION_DATA, dataKey: 'rate', color: '#8b5cf6' },
-    { id: 7, type: 'area', title: 'Quarterly Churn Rate', data: CHURN_DATA, dataKey: 'churn', color: '#ec4899' },
-    { id: 8, type: 'composed', title: 'Sales vs Target', data: SALES_TARGET_DATA, dataKey: 'sales', color: 'hsl(var(--primary))' },
   ]);
   const addWidget = () => {
     setWidgets([...widgets, { id: Date.now(), type: 'bar', title: 'New Widget', data: REVENUE_DATA, dataKey: 'value', color: 'hsl(var(--primary))' }]);
