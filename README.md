@@ -117,27 +117,32 @@ npm run dev
 
 ---
 
-## 🚂 Railway Deployment (Production)
+## 🚀 Deployment (Production)
 
-Deploying MetricMind on Railway is straightforward since it supports monorepos out-of-the-box. We deploy the **Backend** and **Frontend** as two separate services from the same GitHub repository.
+To host MetricMind for free or on a budget, we recommend deploying the **Backend to Render** and the **Frontend to Vercel**.
 
-### 1. Deploy the Backend (FastAPI)
-1. In your Railway dashboard, click **New Project** -> **Deploy from GitHub repo**.
-2. Select the `MetricMind` repository.
-3. In the deployment settings for the new service, go to **Settings**.
-4. Set the **Root Directory** to `/backend`.
-5. Under **Variables**, add your environment variables (e.g., `GEMINI_API_KEY`, `SECRET_KEY`, `DATABASE_URL` if using Postgres).
-6. Click **Deploy**. Railway will automatically detect the `requirements.txt` and run the app using the `Procfile`.
-7. Once deployed, go to the **Settings** tab and click **Generate Domain** under Networking. Copy this URL (e.g., `https://metricmind-backend.up.railway.app`).
+### 1. Deploy the Backend (Render)
+Render makes deploying the FastAPI backend incredibly easy using the included `render.yaml` Blueprint.
+1. Sign up for a [Render](https://render.com) account.
+2. Go to your Render Dashboard and click **New** -> **Blueprint**.
+3. Connect your GitHub account and select the `MetricMind` repository.
+4. Render will automatically detect the `render.yaml` file in the root directory.
+5. Provide the required API keys (`GEMINI_API_KEY`, etc.) when prompted.
+6. Click **Apply**. Render will build and deploy the backend.
+7. Once live, copy your backend's public URL (e.g., `https://metricmind-backend.onrender.com`).
 
-### 2. Deploy the Frontend (React Vite)
-1. From the same Railway project, click **New Service** -> **Deploy from GitHub repo**.
-2. Select the `MetricMind` repository again.
-3. In the new service's **Settings**, set the **Root Directory** to `/frontend`.
-4. Under **Variables**, add:
-   - `VITE_API_URL`: Set this to your Backend's generated domain URL appended with `/api/v1` (e.g., `https://metricmind-backend.up.railway.app/api/v1`).
-5. Click **Deploy**. Railway will run `npm run build` and launch the React app.
-6. Generate a public domain for the frontend service to access your live application.
+### 2. Deploy the Frontend (Vercel)
+Vercel provides best-in-class performance for React/Vite frontends.
+1. Sign up for a [Vercel](https://vercel.com) account.
+2. From your Vercel dashboard, click **Add New** -> **Project**.
+3. Import the `MetricMind` repository from GitHub.
+4. In the **Configure Project** step:
+   - Expand the **Framework Preset** and ensure it says **Vite**.
+   - Change the **Root Directory** to `frontend`.
+5. Open the **Environment Variables** section and add:
+   - Name: `VITE_API_URL`
+   - Value: Your Render backend URL + `/api/v1` (e.g., `https://metricmind-backend.onrender.com/api/v1`).
+6. Click **Deploy**. Vercel will automatically build the React app and give you a public URL. (Routing is automatically handled by the included `vercel.json`).
 
 ---
 
