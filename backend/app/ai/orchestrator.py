@@ -9,7 +9,7 @@ from app.warehouse.factory import get_warehouse_adapter
 
 class AgentOrchestrator:
     def __init__(self):
-        self.provider = get_llm_provider("gemini")
+        self.provider = get_llm_provider("orchestrated")
         self.warehouse = get_warehouse_adapter("postgres")
         
     async def process_chat(self, user_message: str, history: list = None, user_role: str = "Viewer") -> str:
