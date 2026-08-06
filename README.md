@@ -116,4 +116,29 @@ npm run dev
 - **Admin Context Injection**: Securely passes user authentication tokens directly into the Semantic layer for stringent RBAC verification.
 
 ---
+
+## 🚂 Railway Deployment (Production)
+
+Deploying MetricMind on Railway is straightforward since it supports monorepos out-of-the-box. We deploy the **Backend** and **Frontend** as two separate services from the same GitHub repository.
+
+### 1. Deploy the Backend (FastAPI)
+1. In your Railway dashboard, click **New Project** -> **Deploy from GitHub repo**.
+2. Select the `MetricMind` repository.
+3. In the deployment settings for the new service, go to **Settings**.
+4. Set the **Root Directory** to `/backend`.
+5. Under **Variables**, add your environment variables (e.g., `GEMINI_API_KEY`, `SECRET_KEY`, `DATABASE_URL` if using Postgres).
+6. Click **Deploy**. Railway will automatically detect the `requirements.txt` and run the app using the `Procfile`.
+7. Once deployed, go to the **Settings** tab and click **Generate Domain** under Networking. Copy this URL (e.g., `https://metricmind-backend.up.railway.app`).
+
+### 2. Deploy the Frontend (React Vite)
+1. From the same Railway project, click **New Service** -> **Deploy from GitHub repo**.
+2. Select the `MetricMind` repository again.
+3. In the new service's **Settings**, set the **Root Directory** to `/frontend`.
+4. Under **Variables**, add:
+   - `VITE_API_URL`: Set this to your Backend's generated domain URL appended with `/api/v1` (e.g., `https://metricmind-backend.up.railway.app/api/v1`).
+5. Click **Deploy**. Railway will run `npm run build` and launch the React app.
+6. Generate a public domain for the frontend service to access your live application.
+
+---
+
 *Developed by Advanced Agentic Engineering Team*
