@@ -6,7 +6,12 @@ export function MainLayout() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div 
+      className="min-h-screen flex flex-col text-foreground bg-cover bg-center bg-fixed relative"
+      style={{ backgroundImage: "url('/bg.png')" }}
+    >
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px] z-0"></div>
+      <div className="relative z-10 flex flex-col min-h-screen">
       <header className="h-16 border-b glass fixed top-0 w-full z-50 flex items-center justify-between px-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
@@ -35,6 +40,7 @@ export function MainLayout() {
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
         &copy; {new Date().getFullYear()} MetricMind. Enterprise Analytics. All rights reserved.
       </footer>
+      </div>
     </div>
   );
 }

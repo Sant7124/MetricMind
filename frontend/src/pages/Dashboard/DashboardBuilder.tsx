@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Plus, LayoutGrid, Save, Settings, Database, CheckCircle, AlertTriangle, Layers, Copy, TrendingUp, Users, Activity, CreditCard, Bell, ChevronRight } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ComposedChart } from "recharts";
 
@@ -126,7 +127,7 @@ export function DashboardBuilder() {
           { title: "Sales Target", value: "85%", icon: <TrendingUp className="text-indigo-500" size={20} />, trend: "+19% from last month", trendUp: true },
           { title: "Active Sessions", value: "1,203", icon: <Activity className="text-amber-500" size={20} />, trend: "-4% from last hour", trendUp: false }
         ].map((kpi, i) => (
-          <div key={i} className="glass p-6 rounded-xl border border-border flex flex-col justify-between hover:border-primary/30 transition-colors shadow-sm">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} key={i} className="glass p-6 rounded-xl border border-border flex flex-col justify-between hover:border-primary/30 transition-colors shadow-sm">
             <div className="flex justify-between items-center mb-4">
               <span className="text-sm font-medium text-muted-foreground">{kpi.title}</span>
               <div className="p-2 bg-secondary rounded-lg">{kpi.icon}</div>
@@ -137,7 +138,7 @@ export function DashboardBuilder() {
                 {kpi.trend}
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 

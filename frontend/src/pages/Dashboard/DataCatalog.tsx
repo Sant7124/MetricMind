@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Search, Database, Calendar } from "lucide-react";
 import api from "../../services/api";
 
@@ -155,8 +156,8 @@ export function DataCatalog() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map(m => (
-          <div key={m.name} className="glass p-5 rounded-xl border border-border hover:border-primary/50 transition-colors group cursor-pointer">
+        {filtered.map((m, i) => (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} key={m.name} className="glass p-5 rounded-xl border border-border hover:border-primary/50 transition-colors group cursor-pointer">
             <div className="flex justify-between items-start mb-2">
               <h3 className="text-lg font-bold text-primary group-hover:underline">{m.name}</h3>
               <span className="px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
@@ -179,7 +180,7 @@ export function DataCatalog() {
                 <span className="flex items-center gap-1 text-xs"><Database size={12}/> {m.business_owner}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

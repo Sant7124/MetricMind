@@ -70,9 +70,14 @@ export function DashboardLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div 
+      className="min-h-screen text-foreground flex bg-cover bg-center bg-fixed relative"
+      style={{ backgroundImage: "url('/bg.png')" }}
+    >
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px] z-0"></div>
+      
       {/* Sidebar */}
-      <aside className="w-64 border-r border-border glass hidden md:flex flex-col">
+      <aside className="w-64 border-r border-border glass hidden md:flex flex-col relative z-10">
         <div className="p-4 border-b border-border flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="font-bold text-primary-foreground">M</span>
@@ -166,7 +171,7 @@ export function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative z-10">
         {/* Top Navbar */}
         <header className="h-16 border-b glass sticky top-0 z-30 flex items-center justify-between px-6">
           <div className="flex-1 flex items-center">

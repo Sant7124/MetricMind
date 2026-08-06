@@ -1,4 +1,5 @@
 import { useAuth } from "../../contexts/AuthContext";
+import { motion } from "framer-motion";
 import { User, Mail, Building, Clock, Globe, Shield, Activity, Key, Smartphone, Laptop } from "lucide-react";
 import { UserAvatar } from "../../components/UserAvatar";
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
@@ -29,7 +30,7 @@ export function UserProfile() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass rounded-xl border border-border p-6 relative overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass rounded-xl border border-border p-6 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/20 to-indigo-500/20"></div>
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 relative z-10 mt-8">
               <UserAvatar user={user} className="w-28 h-28 shadow-xl ring-4 ring-background" textClass="text-4xl drop-shadow-md" />
@@ -62,9 +63,9 @@ export function UserProfile() {
                 </select>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="glass rounded-xl border border-border p-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass rounded-xl border border-border p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Activity size={18} /> Recent Activity
             </h3>
@@ -82,11 +83,11 @@ export function UserProfile() {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
         <div className="space-y-6">
-          <div className="glass rounded-xl border border-border p-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass rounded-xl border border-border p-6">
             <h3 className="text-lg font-semibold mb-2">Platform Usage</h3>
             <div className="h-48 w-full -ml-4">
               <ResponsiveContainer width="100%" height="100%">
@@ -108,9 +109,9 @@ export function UserProfile() {
                 <div className="text-xs text-muted-foreground">Reports Saved</div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="glass rounded-xl border border-border p-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass rounded-xl border border-border p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Shield size={18} /> Active Sessions
             </h3>
@@ -133,7 +134,7 @@ export function UserProfile() {
             <button className="w-full mt-4 py-2 text-xs font-medium text-destructive border border-destructive/20 hover:bg-destructive/10 rounded-lg transition-colors">
               Sign out of all other sessions
             </button>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
