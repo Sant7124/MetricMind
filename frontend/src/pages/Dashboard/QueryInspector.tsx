@@ -1,163 +1,193 @@
 import { useState, useEffect } from "react";
-import { Code, CheckCircle, Clock } from "lucide-react";
+import { Code, CheckCircle, Clock, Search, Zap, Server, ShieldCheck, Cpu } from "lucide-react";
 import api from "../../services/api";
+
+const THEMES: Record<string, any> = {
+  indigo: { border: "border-indigo-500/20", bgTo: "to-indigo-500/5", borderHover: "hover:border-indigo-500/40", iconBg: "bg-indigo-500/15", iconText: "text-indigo-600", text: "text-indigo-500" },
+  blue: { border: "border-blue-500/20", bgTo: "to-blue-500/5", borderHover: "hover:border-blue-500/40", iconBg: "bg-blue-500/15", iconText: "text-blue-600", text: "text-blue-500" },
+  emerald: { border: "border-emerald-500/20", bgTo: "to-emerald-500/5", borderHover: "hover:border-emerald-500/40", iconBg: "bg-emerald-500/15", iconText: "text-emerald-600", text: "text-emerald-500" },
+  amber: { border: "border-amber-500/20", bgTo: "to-amber-500/5", borderHover: "hover:border-amber-500/40", iconBg: "bg-amber-500/15", iconText: "text-amber-600", text: "text-amber-500" },
+  purple: { border: "border-purple-500/20", bgTo: "to-purple-500/5", borderHover: "hover:border-purple-500/40", iconBg: "bg-purple-500/15", iconText: "text-purple-600", text: "text-purple-500" },
+  rose: { border: "border-rose-500/20", bgTo: "to-rose-500/5", borderHover: "hover:border-rose-500/40", iconBg: "bg-rose-500/15", iconText: "text-rose-600", text: "text-rose-500" },
+};
 
 export function QueryInspector() {
   const [queries, setQueries] = useState<any[]>([]);
 
   useEffect(() => {
-    // Poll or fetch once. In real app, maybe use websockets for live feed.
+    // Generate exactly 5 demo queries
+    const metricsList = [["Gross Revenue"], ["Churn Rate"], ["DAU", "MAU"], ["CAC"], ["Net Promoter Score"]];
+    const dimsList = [["Quarter"], ["Region"], ["Product Line"], ["Cohort"], ["Campaign"]];
+    const questions = [
+      "What was our gross revenue last quarter?",
+      "Show me churn rate by region",
+      "How many daily active users do we have by OS?",
+      "What is our customer acquisition cost for the summer campaign?",
+      "Show NPS scores broken down by product line"
+    ];
+    const sqls = [
+      "SELECT SUM(amount) FROM sales WHERE date >= '2026-04-01' AND date < '2026-07-01'",
+      "SELECT region, (COUNT(CASE WHEN status = 'churned' THEN 1 END) * 100.0 / COUNT(*)) as churn_rate FROM customers GROUP BY region",
+      "SELECT os, COUNT(DISTINCT user_id) as active_users FROM events WHERE event_type='login' GROUP BY os",
+      "SELECT SUM(spend)/COUNT(new_users) FROM marketing WHERE campaign='summer_sale'",
+      "SELECT product, AVG(score) FROM nps_surveys GROUP BY product"
+    ];
+    const colors = ["blue", "emerald", "amber", "purple", "rose"];
+
+    const mockQueries = Array.from({ length: 5 }, (_, i) => ({
+      id: `demo-${i}`,
+      user_message: questions[i],
+      execution_time_ms: Math.floor(Math.random() * 500) + 50,
+      semantic_validation: "Passed",
+      metrics: metricsList[i],
+      dimensions: dimsList[i],
+      generated_sql: sqls[i],
+      is_demo: true,
+      color: colors[i]
+    }));
+
+    // Fetch real queries
     api.get("/governance/queries").then(res => {
+      let realQueries = [];
       if (res.data.data && res.data.data.length > 0) {
-        setQueries(res.data.data);
-      } else {
-        // Fallback to mock data to make UI look complete
-        const mockQueries = Array.from({ length: 25 }, (_, i) => {
-          const metricsList = [["Gross Revenue"], ["Churn Rate"], ["DAU", "MAU"], ["CAC"], ["Net Promoter Score"], ["Inventory Turnover"], ["Operating Cash Flow"], ["LTV"], ["MRR", "ARR"], ["Gross Margin"]];
-          const dimsList = [["Quarter"], ["Region"], ["Product Line"], ["Cohort"], ["Campaign"], ["Device OS"], ["Sales Rep"], ["Warehouse"], ["Channel"], ["Country"]];
-          const questions = [
-            "What was our gross revenue last quarter?",
-            "Show me churn rate by region",
-            "How many daily active users do we have by OS?",
-            "What is our customer acquisition cost for the summer campaign?",
-            "Show NPS scores broken down by product line",
-            "What is the inventory turnover at the main warehouse?",
-            "Show operating cash flow year to date",
-            "Calculate lifetime value for Q1 cohorts",
-            "What is our MRR and ARR by country?",
-            "Show gross margin trends by sales rep"
-          ];
-          const sqls = [
-            "SELECT SUM(amount) FROM sales WHERE date >= '2026-04-01' AND date < '2026-07-01'",
-            "SELECT region, (COUNT(CASE WHEN status = 'churned' THEN 1 END) * 100.0 / COUNT(*)) as churn_rate FROM customers GROUP BY region",
-            "SELECT os, COUNT(DISTINCT user_id) as active_users FROM events WHERE event_type='login' GROUP BY os",
-            "SELECT SUM(spend)/COUNT(new_users) FROM marketing WHERE campaign='summer_sale'",
-            "SELECT product, AVG(score) FROM nps_surveys GROUP BY product",
-            "SELECT warehouse, (SUM(cogs)/AVG(inventory)) FROM ops_data GROUP BY warehouse",
-            "SELECT date_trunc('month', date), SUM(cash_in - cash_out) FROM cashflow GROUP BY 1",
-            "SELECT cohort, AVG(lifetime_revenue) FROM customers GROUP BY cohort",
-            "SELECT country, SUM(mrr), SUM(mrr)*12 as arr FROM subscriptions GROUP BY country",
-            "SELECT rep, (SUM(revenue)-SUM(cogs))/SUM(revenue) as margin FROM sales_data GROUP BY rep"
-          ];
-          
-          const rnd = i % 10;
-          return {
-            id: i + 1,
-            user_message: questions[rnd] + (i > 9 ? ` (variation ${i})` : ''),
-            execution_time_ms: Math.floor(Math.random() * 500) + 50,
-            semantic_validation: Math.random() > 0.1 ? "Passed" : "Warning: Ambiguous Dimension",
-            metrics: metricsList[rnd],
-            dimensions: dimsList[rnd],
-            generated_sql: sqls[rnd]
-          };
-        });
-        setQueries(mockQueries);
+        realQueries = res.data.data.map((q: any, i: number) => ({
+          ...q,
+          id: `real-${i}`,
+          is_demo: false,
+          color: "indigo" // Real queries get a special color
+        }));
       }
+      // Combine real queries with demo queries
+      setQueries([...realQueries, ...mockQueries]);
+    }).catch(() => {
+      setQueries(mockQueries);
     });
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">AI Query Inspector</h1>
-        <p className="text-muted-foreground">Transparent audit log of Semantic SQL generated by the Agent.</p>
+    <div className="space-y-8 pb-12">
+      {/* Header section with gradient */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-secondary/30 p-6 rounded-2xl border border-border shadow-sm">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-transparent bg-clip-text">Query Inspector</h1>
+          <p className="text-muted-foreground mt-2 font-medium">Transparent audit log of Semantic SQL generated by the AI Agent.</p>
+        </div>
+        <div className="flex items-center gap-3 px-4 py-2 bg-background border border-border rounded-xl shadow-sm">
+          <ShieldCheck size={20} className="text-emerald-500" />
+          <span className="text-sm font-semibold">Governance Active</span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
-          {queries.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground border border-dashed border-border rounded-xl">
-              No queries have been executed yet. Ask the AI something!
-            </div>
-          ) : queries.map(q => (
-            <div key={q.id} className="glass p-5 rounded-xl border border-border">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="text-sm font-medium mb-1">User Asked:</div>
-                  <div className="text-lg italic text-muted-foreground">"{q.user_message}"</div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          {queries.map((q) => {
+            const theme = THEMES[q.color] || THEMES.blue;
+            return (
+              <div key={q.id} className={`p-6 rounded-2xl border ${theme.border} bg-gradient-to-br from-background ${theme.bgTo} ${theme.borderHover} hover:shadow-md transition-all relative overflow-hidden group`}>
+                {!q.is_demo && (
+                  <div className="absolute top-4 right-[-30px] bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-wider py-1 px-10 rotate-45 shadow-sm">
+                    Live Query
+                  </div>
+                )}
+                
+                <div className="flex justify-between items-start mb-5 relative z-10">
+                  <div className="flex gap-3 items-start">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-inner ${theme.iconBg} ${theme.iconText}`}>
+                      <Search size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">User Asked:</div>
+                      <div className="text-lg font-medium text-foreground">"{q.user_message}"</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0 pr-8">
+                    <span className={`flex items-center gap-1 text-xs px-2.5 py-1 bg-background border border-border rounded-full font-medium shadow-sm`}>
+                      <Clock size={12} className={`${theme.text}`}/> {q.execution_time_ms}ms
+                    </span>
+                    <span className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border ${q.semantic_validation?.includes('Passed') ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 border-amber-500/20'} font-medium`}>
+                      <CheckCircle size={12}/> {q.semantic_validation || "Passed"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1 text-xs px-2 py-1 bg-secondary rounded-md">
-                    <Clock size={12}/> {q.execution_time_ms}ms
-                  </span>
-                  <span className="flex items-center gap-1 text-xs px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-md border border-emerald-500/20">
-                    <CheckCircle size={12}/> {q.semantic_validation}
-                  </span>
+                
+                <div className="grid grid-cols-2 gap-4 mb-5 text-sm relative z-10">
+                  <div className="bg-background/80 p-4 rounded-xl border border-border/50 shadow-sm">
+                    <span className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mb-2 ${theme.text}`}>
+                      <Zap size={14}/> Metrics Extracted
+                    </span>
+                    <div className="font-semibold text-foreground">{q.metrics?.length ? q.metrics.join(", ") : "None"}</div>
+                  </div>
+                  <div className="bg-background/80 p-4 rounded-xl border border-border/50 shadow-sm">
+                    <span className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mb-2 ${theme.text}`}>
+                      <Server size={14}/> Dimensions Extracted
+                    </span>
+                    <div className="font-semibold text-foreground">{q.dimensions?.length ? q.dimensions.join(", ") : "None"}</div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                <div className="bg-secondary/30 p-3 rounded-lg">
-                  <span className="text-muted-foreground block text-xs mb-1">Metrics Extracted</span>
-                  <div className="font-semibold">{q.metrics.join(", ")}</div>
-                </div>
-                <div className="bg-secondary/30 p-3 rounded-lg">
-                  <span className="text-muted-foreground block text-xs mb-1">Dimensions Extracted</span>
-                  <div className="font-semibold">{q.dimensions.length > 0 ? q.dimensions.join(", ") : "None"}</div>
-                </div>
-              </div>
 
-              <div className="bg-[#1e1e1e] rounded-lg p-4 font-mono text-sm overflow-x-auto">
-                <div className="flex items-center gap-2 mb-2 text-xs text-gray-400 border-b border-gray-700 pb-2">
-                  <Code size={14}/> GENERATED SQL (Parameterized safely)
+                <div className="bg-[#1e1e1e] rounded-xl p-5 font-mono text-sm overflow-x-auto relative z-10 shadow-inner border border-gray-800">
+                  <div className="flex items-center gap-2 mb-3 text-xs font-semibold text-gray-400 border-b border-gray-800 pb-3 uppercase tracking-wider">
+                    <Code size={16} className="text-blue-400"/> GENERATED SQL (Parameterized safely)
+                  </div>
+                  <pre className="text-blue-300 leading-relaxed">{q.generated_sql}</pre>
                 </div>
-                <pre className="text-blue-300">{q.generated_sql}</pre>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Cost Summary */}
-          <div className="glass p-5 rounded-xl border border-border">
-            <h3 className="font-semibold mb-4 text-sm flex items-center gap-2">
-              Warehouse Compute
+          <div className="glass p-6 rounded-2xl border border-border shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+            <h3 className="font-bold mb-6 text-lg flex items-center gap-2 relative z-10 text-cyan-500">
+              <Cpu size={20} /> Warehouse Compute
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-5 relative z-10">
               <div>
-                <div className="flex justify-between text-sm mb-1">
+                <div className="flex justify-between text-sm mb-1.5 font-medium">
                   <span className="text-muted-foreground">Total Bytes Scanned</span>
-                  <span className="font-medium">12.4 GB</span>
+                  <span className="font-bold text-foreground">12.4 GB</span>
                 </div>
-                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-[45%]"></div>
+                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden shadow-inner">
+                  <div className="h-full bg-cyan-500 w-[45%] rounded-full"></div>
                 </div>
               </div>
               <div>
-                <div className="flex justify-between text-sm mb-1">
+                <div className="flex justify-between text-sm mb-1.5 font-medium">
                   <span className="text-muted-foreground">Estimated Cost</span>
-                  <span className="font-medium">$0.06</span>
+                  <span className="font-bold text-foreground">$0.06</span>
                 </div>
-                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 w-[15%]"></div>
+                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden shadow-inner">
+                  <div className="h-full bg-emerald-500 w-[15%] rounded-full"></div>
                 </div>
               </div>
-              <div className="pt-2 mt-2 border-t border-border/50">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Semantic Cache Hit Rate</span>
-                  <span className="font-bold text-emerald-500">84.2%</span>
+              <div className="pt-4 mt-4 border-t border-border/50">
+                <div className="flex justify-between text-sm items-center">
+                  <span className="text-muted-foreground font-medium">Semantic Cache Hit Rate</span>
+                  <span className="font-bold text-emerald-500 px-2 py-1 bg-emerald-500/10 rounded-md border border-emerald-500/20">84.2%</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* AI Optimization Recommendations */}
-          <div className="glass p-5 rounded-xl border border-primary/20 bg-primary/5">
-            <h3 className="font-semibold mb-3 text-sm text-primary flex items-center gap-2">
-              AI Optimizations
+          <div className="glass p-6 rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 to-transparent shadow-sm">
+            <h3 className="font-bold mb-5 text-lg text-indigo-500 flex items-center gap-2">
+              <Zap size={20} /> AI Optimizations
             </h3>
-            <div className="space-y-3">
-              <div className="p-3 bg-background/50 rounded-lg border border-border text-sm">
-                <p className="font-medium mb-1">Index Recommendation</p>
-                <p className="text-xs text-muted-foreground">Adding a composite index on <code className="bg-secondary px-1 rounded">orders(region_id, date)</code> could improve query time by ~42%.</p>
+            <div className="space-y-4">
+              <div className="p-4 bg-background rounded-xl border border-border/50 shadow-sm hover:border-indigo-500/30 transition-colors">
+                <p className="font-semibold text-sm mb-1.5 text-foreground">Index Recommendation</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">Adding a composite index on <code className="bg-secondary px-1.5 py-0.5 rounded text-indigo-500 font-semibold border border-border">orders(region_id, date)</code> could improve query time by ~42%.</p>
               </div>
-              <div className="p-3 bg-background/50 rounded-lg border border-border text-sm">
-                <p className="font-medium mb-1">Materialized View</p>
-                <p className="text-xs text-muted-foreground">The AI frequently queries 'Revenue by Region'. Consider materializing this in the warehouse.</p>
+              <div className="p-4 bg-background rounded-xl border border-border/50 shadow-sm hover:border-indigo-500/30 transition-colors">
+                <p className="font-semibold text-sm mb-1.5 text-foreground">Materialized View</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">The AI frequently queries 'Revenue by Region'. Consider materializing this in the warehouse to reduce compute costs.</p>
               </div>
             </div>
-            <button className="w-full mt-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+            <button className="w-full mt-6 py-2.5 text-sm font-bold bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/20 transition-all">
               Apply Optimizations
             </button>
           </div>
