@@ -2,20 +2,19 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional, Any, Union
 from jose import jwt, JWTError
-from passlib.context import CryptContext
 
 # Fallback to local secret if .env fails, but we prefer the env var for security
 SECRET_KEY = os.getenv("SECRET_KEY", "b9c48d4f40f09e86bc050e8d021c3b1a20993081e7d2f44766be15a51969a538")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days for ease of testing
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
     if expires_delta:
