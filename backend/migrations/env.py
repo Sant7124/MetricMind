@@ -3,6 +3,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.engine import Connection
 
 from alembic import context
 
@@ -23,7 +24,7 @@ if config.config_file_name is not None:
 target_metadata = BaseModel.metadata
 
 # Overwrite sqlalchemy.url
-config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URI)
+config.set_main_option("sqlalchemy.url", settings.get_database_url)
 
 
 def run_migrations_offline() -> None:

@@ -1,5 +1,6 @@
 from typing import Dict, Any, Tuple
 from datetime import datetime, timedelta
+from app.core.config import settings
 
 def build_filter_clause(filter_def: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
     """
@@ -18,7 +19,9 @@ def build_filter_clause(filter_def: Dict[str, Any]) -> Tuple[str, Dict[str, Any]
     elif operator == "not_equals":
         return f"{field} != :{param_key}", {param_key: value}
     elif operator == "contains":
-        return f"{field} ILIKE :{param_key}", {param_key: f"%{value}%"}
+        is_postgres = "postgres" in settings.get_database_url
+        op = "ILIKE" if is_postgres else "LIKE"
+        return f"{field} {op} :{param_key}", {param_key: f"%{value}%"}
     elif operator == "greater_than":
         return f"{field} > :{param_key}", {param_key: value}
     elif operator == "less_than":

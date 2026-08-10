@@ -1,6 +1,9 @@
 import httpx
 import asyncio
+import pytest
 from app.core.config import settings
+
+@pytest.mark.asyncio
 
 async def test():
     print("Testing Gemini...")
@@ -28,4 +31,3 @@ async def test():
             print("OpenRouter:", resp.status_code, resp.text[:200])
         except Exception as e: print("OpenRouter Error:", e)
 
-asyncio.run(test())

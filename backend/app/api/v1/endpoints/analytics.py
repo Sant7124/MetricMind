@@ -4,6 +4,8 @@ import time
 import hashlib
 import json
 
+from app.core.config import settings
+
 from app.utils.responses import success_response, error_response, APIResponse
 from app.semantic.engine import SemanticEngine
 from app.query_engine.validator import QueryValidator
@@ -115,16 +117,18 @@ async def get_dashboard_kpis():
 async def get_dashboard_charts():
     try:
         adapter = get_warehouse_adapter("postgres")
-        # Extract YYYY-MM for SQLite. 
-        # For Postgres this would be TO_CHAR(order_date, 'YYYY-MM') or DATE_TRUNC
-        query = """
+        is_postgres = "postgres" in settings.get_database_url
+        
+        month_func = "TO_CHAR(order_date, 'YYYY-MM')" if is_postgres else "strftime('%Y-%m', order_date)"
+        
+        query = f"""
         SELECT 
-            strftime('%Y-%m', order_date) as month, 
+            {month_func} as month, 
             SUM(total_amount) as revenue,
             SUM(total_amount) * 0.7 as gross 
         FROM orders 
         WHERE status = 'completed'
-        GROUP BY strftime('%Y-%m', order_date)
+        GROUP BY {month_func}
         ORDER BY month DESC
         LIMIT 12
         """

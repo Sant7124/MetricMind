@@ -12,7 +12,7 @@ from app.database.session import engine, AsyncSessionLocal
 from app.models.base_model import BaseModel
 from app.models.sales import Customer, Product, Order, OrderItem
 from app.models.user import User
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 fake = Faker()
 
@@ -43,6 +43,11 @@ async def seed_db():
 
         # Generate Customers
         print("Generating Customers...")
+        customer_count = await session.scalar(select(func.count()).select_from(Customer))
+        if customer_count > 0:
+            print("Database already seeded with synthetic data. Skipping...")
+            return
+            
         customers = []
         for _ in range(50):
             customer = Customer(
