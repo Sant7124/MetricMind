@@ -119,20 +119,29 @@ npm run dev
 
 ## 🚀 Deployment (Production)
 
-To host MetricMind for free or on a budget, we recommend deploying the **Backend to Render** and the **Frontend to Vercel**.
+To host MetricMind for free, we recommend deploying the **Backend to Render** as a Web Service and the **Frontend to Vercel**.
 
-### 1. Deploy the Backend (Render)
-Render makes deploying the FastAPI backend incredibly easy using the included `render.yaml` Blueprint.
+### 1. Deploy the Backend (Render - Free Web Service)
+Render offers a free tier for standard web services, which is perfect for this FastAPI backend running on SQLite.
 1. Sign up for a [Render](https://render.com) account.
-2. Go to your Render Dashboard and click **New** -> **Blueprint**.
+2. Go to your Render Dashboard and click **New** -> **Web Service**.
 3. Connect your GitHub account and select the `MetricMind` repository.
-4. Render will automatically detect the `render.yaml` file in the root directory.
-5. Provide the required API keys (`GEMINI_API_KEY`, etc.) when prompted.
-6. Click **Apply**. Render will build and deploy the backend.
+4. Configure the Web Service:
+   - **Name**: `metricmind-backend` (or similar)
+   - **Root Directory**: `backend`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+5. Open the **Environment Variables** section and add:
+   - `PYTHON_VERSION`: `3.11.0`
+   - `SECRET_KEY`: (Generate a secure random string)
+   - `GEMINI_API_KEY`: (Your Gemini API Key)
+   - `OPENROUTER_API_KEY`: (Your OpenRouter API Key, if applicable)
+6. Choose the **Free** instance type and click **Create Web Service**.
 7. Once live, copy your backend's public URL (e.g., `https://metricmind-backend.onrender.com`).
 
-### 2. Deploy the Frontend (Vercel)
-Vercel provides best-in-class performance for React/Vite frontends.
+### 2. Deploy the Frontend (Vercel - Free Tier)
+Vercel provides best-in-class performance for React/Vite frontends on their completely free Hobby tier.
 1. Sign up for a [Vercel](https://vercel.com) account.
 2. From your Vercel dashboard, click **Add New** -> **Project**.
 3. Import the `MetricMind` repository from GitHub.
