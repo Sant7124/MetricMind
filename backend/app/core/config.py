@@ -37,6 +37,16 @@ class Settings(BaseSettings):
                 url = url.replace("postgres://", "postgresql+asyncpg://", 1)
             elif url.startswith("postgresql://") and "asyncpg" not in url:
                 url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+                
+            if "?" in url:
+                from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+                parsed = urlparse(url)
+                query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+                if "sslmode" in query:
+                    query["ssl"] = query.pop("sslmode")
+                    parsed = parsed._replace(query=urlencode(query))
+                    url = urlunparse(parsed)
+                
             return url
             
         if self.ENVIRONMENT == "production":
